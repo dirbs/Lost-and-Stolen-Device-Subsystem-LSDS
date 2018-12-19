@@ -35,9 +35,6 @@ class NatureOfIncident(db.Model):
     description = db.Column(db.Text)
     case_incident_details = db.relationship("CaseIncidentDetails", backref="natureofincident", lazy=True)
 
-    def __repr__(self):
-        return '%r' % self.id
-
     @property
     def serialize(self):
         """Serialize."""

@@ -23,7 +23,7 @@
 #                                                                                                                     #
 #######################################################################################################################
 
-from app import app, HOST, PORT
+from app import app
 
 if __name__ == "__main__":
-    app.run(host=HOST, port=PORT)
+    app.run(host=str(app.config['dev_config']['Server']['Host']), port=int(app.config['dev_config']['Server']['Port']))

@@ -34,23 +34,7 @@ class Status(db.Model):
     description = db.Column(db.Text)
     cases = db.relationship("Case", backref="Status", lazy=True)
 
-    def __init(self, code, description):
-        """Constructor."""
-        self.code = code
-        self.description = description
-
-    def __repr__(self):
-        return '%r' % self.id
-
     @property
     def serialize(self):
         """Serialize data."""
         return self.description
-
-    @property
-    def serialize_all(self):
-        """Serialize all columns"""
-        return {
-            "Id": self.id,
-            "Type": self.description
-        }

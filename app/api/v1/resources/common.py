@@ -27,15 +27,16 @@ import json
 import requests
 
 from flask import Response
-from app import app, CORE_BASE_URL, VERSION
+from app import app
 from ..models.status import Status
 from flask_apispec import MethodResource, doc
+
 
 @app.route('/')
 def index_route():
     """Flask base route"""
     data = {
-        'message': 'Welcome to LSMS'
+        'message': 'Welcome to LSDS'
     }
 
     response = Response(json.dumps(data), status=200, mimetype='application/json')
@@ -49,7 +50,7 @@ class BaseRoutes(MethodResource):
     def get(self):
         """Check system's connection with DIRBS core and database."""
         try:
-            resp = requests.get('{base}/{version}/version'.format(base=CORE_BASE_URL, version=VERSION))  # dirbs core imei api call
+            resp = requests.get('{base}/{version}/version'.format(base=app.config['system_config']['dirbs_core']['base_url'], version=app.config['system_config']['dirbs_core']['version']))  # dirbs core imei api call
             if resp.status_code == 200:
                 data = {
                     "core_status": "CORE connected successfully."

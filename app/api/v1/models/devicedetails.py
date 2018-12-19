@@ -47,9 +47,6 @@ class DeviceDetails(db.Model):
         self.model_name = model_name
         self.physical_description = description
 
-    def __repr__(self):
-        return '%r' % self.id
-
     @property
     def serialize(self):
         """Serialize data."""
@@ -60,17 +57,6 @@ class DeviceDetails(db.Model):
             'imeis': [imei.serialize for imei in self.device_imeis],
             'msisdns': [msisdn.serialize for msisdn in self.device_msisdns]
         }
-
-    @staticmethod
-    def get(device_id):
-        """Get details by id."""
-        try:
-            if device_id:
-                device = DeviceDetails.query.filter_by(id=device_id).first()
-                return device.serialize
-            return {}
-        except Exception:
-            raise Exception
 
     @classmethod
     def add(cls, args, case_id):

@@ -1,6 +1,6 @@
 import re
 from marshmallow import ValidationError
-from app import GLOBAL_CONF
+from app import app
 
 
 def validate_name(val):
@@ -42,10 +42,10 @@ def validate_date(val):
 def validate_imei(val):
     """Validate IMEI format."""
     match = re.match('^[a-fA-F0-9]{14,16}$', val)
-    if len(val) < GLOBAL_CONF.get('min_imei_length'):
-        raise ValidationError("IMEI too short, should contain at least {min} characters".format(min=GLOBAL_CONF.get('min_imei_length')))
-    if len(val) > GLOBAL_CONF.get('max_imei_length'):
-        raise ValidationError("IMEI too long, cannot contain more than {max} characters".format(max= GLOBAL_CONF.get('max_imei_length')))
+    if len(val) < app.config['system_config']['global'].get('min_imei_length'):
+        raise ValidationError("IMEI too short, should contain at least {min} characters".format(min=app.config['system_config']['global'].get('min_imei_length')))
+    if len(val) > app.config['system_config']['global'].get('max_imei_length'):
+        raise ValidationError("IMEI too long, cannot contain more than {max} characters".format(max= app.config['system_config']['global'].get('max_imei_length')))
     if match is None:
         raise ValidationError("IMEI is invalid.")
 
@@ -59,9 +59,9 @@ def validate_msisdn(val):
 
 def validate_gin(val):
     """Validate government identification number format."""
-    match = re.match(GLOBAL_CONF.get('gin_regex'), val)
+    match = re.match(app.config['system_config']['global'].get('gin_regex'), val)
     if match is None:
-        raise ValidationError("Government Identification Number must contain {range} digits".format(range=GLOBAL_CONF.get('gin_length')))
+        raise ValidationError("Government Identification Number must contain {range} digits".format(range=app.config['system_config']['global'].get('gin_length')))
 
 
 def validate_others(val, min_range, max_range, field):
