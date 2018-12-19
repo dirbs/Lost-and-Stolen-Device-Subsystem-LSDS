@@ -42,40 +42,6 @@ class CaseComments(db.Model):
         self.user_id = user_id
         self.username = username
 
-    def __repr__(self):
-        return '%r' % self.id
-
-    @property
-    def serialize(self):
-        """Serialize data."""
-        return {
-            "user_id": self.user_id,
-            "comment": self.comments,
-            "username": self.username,
-            "comment_date": self.comment_date
-        }
-
-    @staticmethod
-    def __get_id(instr_obj):
-        """return string value from instrumented list object."""
-        try:
-            if len(instr_obj) > 0:
-                return str(instr_obj[0])
-            return None
-        except Exception:
-            raise Exception
-
-    @staticmethod
-    def get(record_id):
-        """retrieve data by id"""
-        try:
-            if record_id:
-                comment = CaseComments.query.filter_by(id=record_id).first()
-                return comment.serialize
-            return []
-        except Exception:
-            raise Exception
-
     @classmethod
     def add(cls, case_comment, case_id, user_id, username):
         """Insert data"""
@@ -86,4 +52,3 @@ class CaseComments(db.Model):
         except Exception:
             db.session.rollback()
             raise Exception
-

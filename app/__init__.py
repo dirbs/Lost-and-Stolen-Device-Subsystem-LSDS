@@ -28,11 +28,6 @@ import sys
 import yaml
 import configparser
 
-import requests
-from urllib3.util.retry import Retry
-from requests.adapters import HTTPAdapter
-
-
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
@@ -43,24 +38,18 @@ CORS(app)
 try:
     config = configparser.ConfigParser()
     config.read("config.ini")
+    app.config['dev_config'] = config
 
     global_config = yaml.load(open("etc/config.yml"))
+    app.config['system_config'] = global_config
 
     db_params = {
-        'Host': config['Database']['Host'],
-        'Port': config['Database']['Port'],
-        'Database': config['Database']['Database'],
-        'User': config['Database']['UserName'],
-        'Password': config['Database']['Password']
+        'Host': app.config['dev_config']['Database']['Host'],
+        'Port': app.config['dev_config']['Database']['Port'],
+        'Database': app.config['dev_config']['Database']['Database'],
+        'User': app.config['dev_config']['Database']['UserName'],
+        'Password': app.config['dev_config']['Database']['Password']
     }
-
-    HOST = str(config['Server']['Host'])  # Host addr required as str
-    PORT = int(config['Server']['Port'])  # Host port required as int
-    CORE_BASE_URL = global_config['dirbs_core']['base_url']  # core api base url
-    VERSION = global_config['dirbs_core']['version']  # core api version
-    GLOBAL_CONF = global_config['global']  # load & export global configs
-    UPLOADS = str(config['UPLOADS']['list_dir'])  # stolen list upload path
-    APP_VERSION = global_config['system']['version']
 
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://%s:%s@%s:%s/%s' % \
                                             (db_params['User'], db_params['Password'], db_params['Host'],
@@ -68,20 +57,13 @@ try:
 
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-    app.config['SQLALCHEMY_POOL_SIZE'] = int(config['Database']['pool_size'])
-    app.config['SQLALCHEMY_POOL_RECYCLE'] = int(config['Database']['pool_recycle'])
-    app.config['SQLALCHEMY_MAX_OVERFLOW'] = int(config['Database']['overflow_size'])
-    app.config['SQLALCHEMY_POOL_TIMEOUT'] = int(config['Database']['pool_timeout'])
+    app.config['SQLALCHEMY_POOL_SIZE'] = int(app.config['dev_config']['Database']['pool_size'])
+    app.config['SQLALCHEMY_POOL_RECYCLE'] = int(app.config['dev_config']['Database']['pool_recycle'])
+    app.config['SQLALCHEMY_MAX_OVERFLOW'] = int(app.config['dev_config']['Database']['overflow_size'])
+    app.config['SQLALCHEMY_POOL_TIMEOUT'] = int(app.config['dev_config']['Database']['pool_timeout'])
 
     db = SQLAlchemy()
     db.init_app(app)
-
-    session = requests.Session()
-    session.keep_alive = False
-    retry = Retry(total=GLOBAL_CONF.get('retry'), backoff_factor=1, status_forcelist=[502, 503, 504])
-    adapter = HTTPAdapter(max_retries=retry)
-    session.mount('http://', adapter)
-    session.mount('https://', adapter)
 
     from app.api.v1.routes import *
 

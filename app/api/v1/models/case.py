@@ -62,9 +62,6 @@ class Case(db.Model):
         self.username = args.get("loggedin_user").get("username")
         self.case_status = case_status
 
-    def __repr__(self):
-        return '<Case %r>' % self.id
-
     @property
     def serialize(self):
         """Serialize data."""
@@ -119,8 +116,9 @@ class Case(db.Model):
                 if flag:
                     return {'flag': flag, 'imei': imei}
             return {'flag': None, 'imei': None}
-        except Exception as e:
-            raise e
+        except Exception:
+            db.session.rollback()
+            raise Exception
 
     @classmethod
     def create(cls, args):

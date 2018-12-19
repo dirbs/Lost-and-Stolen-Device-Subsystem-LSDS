@@ -23,33 +23,34 @@
 #                                                                                                                     #
 #######################################################################################################################
 
-from app import db
+# LSDS v1.0.0 Global configs
 
 
-class DeviceImei(db.Model):
-    """Database model for device IMEIs"""
-    id = db.Column(db.Integer, primary_key=True)
-    imei = db.Column(db.String(16))
-    device_id = db.Column(db.Integer, db.ForeignKey('device_details.id', ondelete='CASCADE'))
+# DIRBS Core configurations
+dirbs_core:
+  base_url: 'http://192.168.100.12:5000/api'
+  version: v2
 
-    def __init__(self, imei, device_id):
-        """Constructor."""
-        self.imei = imei
-        self.device_id = device_id
 
-    @property
-    def serialize(self):
-        """Serialize."""
-        return self.imei
+# lsds global configurations
+global:
+  # minimum govt identification number length to be used
+  gin_length: 13
+  gin_regex: '^\d{5}\-?\d{7}\-?\d$'
 
-    @classmethod
-    def add(cls, device_id, imeis):
-        """Insert data."""
-        try:
-            for imei in imeis:
-                device_imei = cls(imei, device_id)
-                db.session.add(device_imei)
-        except Exception:
-            db.session.rollback()
-            raise Exception
+  # user phone number minimum length
+  min_num_length: 11
+  max_num_length: 14
 
+  # minimum and maximum global imei lengths
+  min_imei_length: 14
+  max_imei_length: 16
+
+  # minimum and maximum global msisdn lengths
+  min_msisdn_length: 7
+  max_msisdn_length: 15
+
+  retry: 10
+
+system:
+  version: 'v1'

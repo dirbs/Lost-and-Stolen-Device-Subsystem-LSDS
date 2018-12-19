@@ -47,9 +47,6 @@ class CasePersonalDetails(db.Model):
         self.alternate_number = args.get("number")
         self.email = args.get("email")
 
-    def __repr__(self):
-        return '%r' % self.id
-
     @property
     def serialize(self):
         """Serialize data."""
@@ -61,17 +58,6 @@ class CasePersonalDetails(db.Model):
             'number': self.alternate_number,
             'email': self.email
         }
-
-    @staticmethod
-    def get(person_id):
-        """Get details by id"""
-        try:
-            if person_id:
-                person = CasePersonalDetails.query.filter_by(id=person_id).first()
-                return person.serialize
-            return {}
-        except Exception:
-            raise Exception
 
     @classmethod
     def add(cls, args, case_id):
