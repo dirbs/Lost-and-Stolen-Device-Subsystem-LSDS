@@ -37,4 +37,3 @@ flask-cors==3.0.4
 marshmallow==2.15.4
 flask-apispec==0.7.0
 apispec==0.39.0
-urllib3==1.22
