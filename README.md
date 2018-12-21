@@ -16,8 +16,15 @@ NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS 
 
 ### Lost & Stolen Device Subsystem (LSDS)
 Lost & Stolen Device Subsystem (LSDS) that is part of the Device Identification,
-Registration and Blocking (DIRBS) system.
+Registration and Blocking (DIRBS) system.It is used to report lost & stolen devices.
 
+#### Documentation
+[LSDS-API-Installation-Guide-1.0.0](https://github.com/dirbs/Documentation/blob/master/Lost-and-Stolen-Device-Subsystem/LSDS-API-Installation-Guide-1.0.0.pdf)<br />
+[LSDS-SPA-Installation-Guide-1.0.0.pdf](https://github.com/dirbs/Documentation/blob/master/Lost-and-Stolen-Device-Subsystem/LSDS-SPA-Installation-Guide-1.0.0.pdf) <br />
+[LSDS-User-Guide-1.0.0.pdf](https://github.com/dirbs/Documentation/blob/master/Lost-and-Stolen-Device-Subsystem/LSDS-User-Guide-1.0.0.pdf)<br />
+
+#### Frontend Application Repo
+https://github.com/dirbs/Lost-and-Stolen-Device-Subsystem-Frontend
 
 ##### Directory structure
 
