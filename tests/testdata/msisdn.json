@@ -1,0 +1,64 @@
+{
+  "results": [
+    {
+      "gsma": {
+        "brand_name": "string",
+        "manufacturer": "string",
+        "model_name": "string"
+      },
+      "imei_norm": "12345678901111",
+      "imsi": "12345678900000",
+      "last_seen": "2018-10-02",
+      "registration": {
+        "brand_name": "string",
+        "make": "string",
+        "model": "string"
+      }
+    },
+    {
+      "gsma": {
+        "brand_name": "string",
+        "manufacturer": "string",
+        "model_name": "string"
+      },
+      "imei_norm": "12345678902222",
+      "imsi": "12345678900000",
+      "last_seen": "2018-09-02",
+      "registration": {
+        "brand_name": "string",
+        "make": "string",
+        "model": "string"
+      }
+    },
+    {
+      "gsma": {
+        "brand_name": "string",
+        "manufacturer": "string",
+        "model_name": "string"
+      },
+      "imei_norm": "12345678903333",
+      "imsi": "12345678900000",
+      "last_seen": "2018-09-02",
+      "registration": {
+        "brand_name": "string",
+        "make": "string",
+        "model": "string"
+      }
+    },
+    {
+      "gsma": {
+        "brand_name": "string",
+        "manufacturer": "string",
+        "model_name": "string"
+      },
+      "imei_norm": "12345678903333",
+      "imsi": "12345678900000",
+      "last_seen": "2018-02-02",
+      "registration": {
+        "brand_name": "string",
+        "make": "string",
+        "model": "string"
+      }
+    }
+  ]
+}

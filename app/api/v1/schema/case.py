@@ -70,10 +70,10 @@ class CaseStatusUpdateSchema(Schema):
 
 
 class CasesSchema(Schema):
-    """"""
+    """request schema to get case list"""
     status = fields.Int(validate=lambda p: p == 1 or p == 2 or p == 3)
-    start = fields.Int(validate=lambda p: p >= 1)
-    limit = fields.Int(validate=lambda p: p >= 1)
+    start = fields.Int()
+    limit = fields.Int()
 
     @property
     def fields_dict(self):

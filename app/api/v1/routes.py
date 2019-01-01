@@ -34,10 +34,10 @@ from .resources.stolen_list import StolenList
 # noinspection PyUnresolvedReferences
 from .assets.error_handlers import *
 from app.common.apidoc import ApiDocs
-from app import APP_VERSION, app
+from app import app
 
 api = Api(app, prefix='/api/v1', errors=CustomErrors)
-apidoc = ApiDocs(app, APP_VERSION)
+apidoc = ApiDocs(app, app.config['system_config']['system']['version'])
 
 # noinspection PyTypeChecker
 api.add_resource(BaseRoutes, '/')

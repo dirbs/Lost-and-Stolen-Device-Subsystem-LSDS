@@ -26,7 +26,7 @@
 import json
 import requests
 
-from app import app, CORE_BASE_URL, VERSION
+from app import app
 from flask import Response, request
 from flask_apispec import MethodResource, doc
 
@@ -97,8 +97,8 @@ class FetchMsisdn(MethodResource):
             validate_msisdn(msisdn)
 
             url = '{base_url}/{version}/msisdn/{msisdn}'.format(
-                base_url=CORE_BASE_URL,
-                version=VERSION,
+                base_url=app.config['system_config']['dirbs_core']['base_url'],
+                version=app.config['system_config']['dirbs_core']['version'],
                 msisdn=msisdn
             )
 
@@ -115,18 +115,17 @@ class FetchMsisdn(MethodResource):
                     "tacs": tac_list
                 }
                 headers = {'content-type': 'application/json', 'charset': 'utf-8'}
-                tac_response = requests.post('{base_url}/{version}/tac'.format(base_url=CORE_BASE_URL, version=VERSION), data=json.dumps(batch_req), headers=headers)  # dirbs core batch tac api call
+                tac_response = requests.post('{base_url}/{version}/tac'.format(base_url=app.config['system_config']['dirbs_core']['base_url'], version=app.config['system_config']['dirbs_core']['version']), data=json.dumps(batch_req), headers=headers)  # dirbs core batch tac api call
 
                 tac_response = tac_response.json()
 
                 for tac in tac_response['results']:
                     for records in data['results']:
-                        if tac['tac'] != records['imei_norm'][:8]:
-                            break
-                        registration = CommonResources.get_reg(records['imei_norm'])
-                        gsma = CommonResources.serialize_gsma_data(tac_resp=tac, reg_resp=registration)
-                        del records['registration']
-                        records['gsma'] = gsma['gsma']
+                        if tac['tac'] == records['imei_norm'][:8]:
+                            registration = CommonResources.get_reg(records['imei_norm'])
+                            gsma = CommonResources.serialize_gsma_data(tac_resp=tac, reg_resp=registration)
+                            del records['registration']
+                            records['gsma'] = gsma['gsma']
 
             data['results'] = [x for x in sorted(data['results'], key=lambda x: x['last_seen'], reverse=True)]
             response = Response(json.dumps(data), status=200, mimetype=MIME_TYPES.get('APPLICATION_JSON'))

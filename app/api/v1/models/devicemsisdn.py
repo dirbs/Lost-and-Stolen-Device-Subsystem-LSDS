@@ -37,24 +37,10 @@ class DeviceMsisdn(db.Model):
         self.device_id = device_id
         self.msisdn = msisdn
 
-    def __repr__(self):
-        return '%r' % self.id
-
     @property
     def serialize(self):
         """Serialize."""
         return self.msisdn
-
-    @staticmethod
-    def get(record_id):
-        """Get data by id."""
-        try:
-            if record_id:
-                msisdn = DeviceMsisdn.query.filter_by(id=record_id).first()
-                return msisdn.serialize
-            return []
-        except Exception:
-            raise Exception
 
     @classmethod
     def add(cls, device_id, msisdns):

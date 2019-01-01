@@ -39,9 +39,6 @@ class CaseIncidentDetails(db.Model):
         self.nature_of_incident = args.get("incident_nature")
         self.case_id = case_id
 
-    def __repr__(self):
-        return '%r' % self.id
-
     @property
     def serialize(self):
         """Serialize data."""
@@ -49,17 +46,6 @@ class CaseIncidentDetails(db.Model):
             'incident_date': self.date_of_incident if self.date_of_incident else 'N/A',
             'incident_nature': self.natureofincident.serialize
         }
-
-    @staticmethod
-    def get(incident_id):
-        """Get data by id."""
-        try:
-            if incident_id:
-                incident = CaseIncidentDetails.query.filter_by(id=incident_id).first()
-                return incident.serialize
-            return {}
-        except Exception:
-            raise Exception
 
     @classmethod
     def add(cls, args, case_id):

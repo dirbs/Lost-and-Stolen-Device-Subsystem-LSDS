@@ -24,18 +24,18 @@
 #######################################################################################################################
 
 import re
-from app import GLOBAL_CONF
+from app import app
 
 
 def validate_imei(imei):
     """Validate IMEI format."""
     match = re.match('^[a-fA-F0-9]{14,16}$', imei)
-    if len(imei) < GLOBAL_CONF.get('min_imei_length'):
+    if len(imei) < app.config['system_config']['global'].get('min_imei_length'):
         raise ValueError("imei too short, should contain at least {min} characters".format(
-            min=GLOBAL_CONF.get('min_imei_length')))
-    if len(imei) > GLOBAL_CONF.get('max_imei_length'):
+            min=app.config['system_config']['global'].get('min_imei_length')))
+    if len(imei) > app.config['system_config']['global'].get('max_imei_length'):
         raise ValueError("imei too long, cannot contain more than {max} characters".format(
-            max=GLOBAL_CONF.get('max_imei_length')))
+            max=app.config['system_config']['global'].get('max_imei_length')))
     if match is None:
         raise ValueError("invalid imei")
 
