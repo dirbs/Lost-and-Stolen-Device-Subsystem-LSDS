@@ -97,8 +97,8 @@ class FetchMsisdn(MethodResource):
             validate_msisdn(msisdn)
 
             url = '{base_url}/{version}/msisdn/{msisdn}'.format(
-                base_url=app.config['system_config']['dirbs_core']['base_url'],
-                version=app.config['system_config']['dirbs_core']['version'],
+                base_url=app.config['dev_config']['dirbs_core']['base_url'],
+                version=app.config['dev_config']['dirbs_core']['version'],
                 msisdn=msisdn
             )
 
@@ -115,7 +115,7 @@ class FetchMsisdn(MethodResource):
                     "tacs": tac_list
                 }
                 headers = {'content-type': 'application/json', 'charset': 'utf-8'}
-                tac_response = requests.post('{base_url}/{version}/tac'.format(base_url=app.config['system_config']['dirbs_core']['base_url'], version=app.config['system_config']['dirbs_core']['version']), data=json.dumps(batch_req), headers=headers)  # dirbs core batch tac api call
+                tac_response = requests.post('{base_url}/{version}/tac'.format(base_url=app.config['dev_config']['dirbs_core']['base_url'], version=app.config['dev_config']['dirbs_core']['version']), data=json.dumps(batch_req), headers=headers)  # dirbs core batch tac api call
 
                 tac_response = tac_response.json()
 

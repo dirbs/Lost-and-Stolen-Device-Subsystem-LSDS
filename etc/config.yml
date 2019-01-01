@@ -25,13 +25,6 @@
 
 # LSDS v1.0.0 Global configs
 
-
-# DIRBS Core configurations
-dirbs_core:
-  base_url: 'http://192.168.100.12:5000/api'
-  version: v2
-
-
 # lsds global configurations
 global:
   # minimum govt identification number length to be used

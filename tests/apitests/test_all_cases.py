@@ -76,7 +76,7 @@ def test_pending_cases(flask_app):
     assert response.mimetype == 'application/json'
 
     response = json.loads(response.get_data(as_text=True))
-    assert response['count'] >= 3
+    assert response['count'] > 0
 
 
 def test_blocked_cases(flask_app):
@@ -87,7 +87,7 @@ def test_blocked_cases(flask_app):
     assert response.mimetype == 'application/json'
 
     response = json.loads(response.get_data(as_text=True))
-    assert response['count'] >= 4
+    assert response['count'] > 0
 
 
 def test_recovered_cases(flask_app):
@@ -98,7 +98,7 @@ def test_recovered_cases(flask_app):
     assert response.mimetype == 'application/json'
 
     response = json.loads(response.get_data(as_text=True))
-    assert response['count'] >= 3
+    assert response['count'] > 0
 
 
 def test_all_cases(flask_app):
@@ -108,7 +108,7 @@ def test_all_cases(flask_app):
     assert response.mimetype == 'application/json'
 
     response = json.loads(response.get_data(as_text=True))
-    assert response['count'] >= 10
+    assert response['count'] > 0
 
 
 def test_case_post_method(flask_app):
