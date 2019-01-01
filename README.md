@@ -19,19 +19,12 @@
  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-## Lost & Stolen Device Subsystem (LSDS)
+### Lost & Stolen Device Subsystem (LSDS)
 Lost & Stolen Device Subsystem (LSDS) that is part of the Device Identification,
-Registration and Blocking (DIRBS) system.It is used to report lost & stolen devices.
+Registration and Blocking (DIRBS) system.
 
-### Documentation
-[LSDS-API-Installation-Guide-1.0.0](https://github.com/dirbs/Documentation/blob/master/Lost-and-Stolen-Device-Subsystem/LSDS-API-Installation-Guide-1.0.0.pdf)<br />
-[LSDS-SPA-Installation-Guide-1.0.0.pdf](https://github.com/dirbs/Documentation/blob/master/Lost-and-Stolen-Device-Subsystem/LSDS-SPA-Installation-Guide-1.0.0.pdf) <br />
-[LSDS-User-Guide-1.0.0.pdf](https://github.com/dirbs/Documentation/blob/master/Lost-and-Stolen-Device-Subsystem/LSDS-User-Guide-1.0.0.pdf)<br />
 
-### Frontend Application Repo
-https://github.com/dirbs/Lost-and-Stolen-Device-Subsystem-Frontend
-
-### Directory structure
+##### Directory structure
 
 This repository contains code for **LSDS** part of the **DIRBS**. It contains
 
@@ -40,7 +33,7 @@ This repository contains code for **LSDS** part of the **DIRBS**. It contains
 * ``mock/`` -- Sample data files etc which are used in app to be reside here
 * ``tests/`` -- Unit test scripts and Data
 
-###Prerequisites
+##### Prerequisites
 In order to run a development environment, [Python 3.0+](https://www.python.org/download/releases/3.0/) and 
 [Postgresql10](https://www.postgresql.org/about/news/1786/) we assume that these are installed.
 
@@ -50,11 +43,11 @@ all commands mentioned in this guide are run from root directory of the project 
 
 On Windows, we assume that a Bash like shell is available (i.e Bash under Cygwin), with GNU make installed.
 
-#### Starting a dev environment
+##### Starting a dev environment
 The easiest and quickest way to get started is to use local-only environment (i.e everything runs locally, including
 Postgresql Server). To setup the local environment, follow the section below:
 
-#### Setting up local dev environment
+##### Setting up local dev environment
 For setting up a local dev environment we assume that the ```prerequisites``` are met already. To setup a local 
 environment:
 * Create database using Postgresql (Name and credentials should be same as in [config](tests/testdata/config.ini))
