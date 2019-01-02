@@ -50,7 +50,7 @@ class BaseRoutes(MethodResource):
     def get(self):
         """Check system's connection with DIRBS core and database."""
         try:
-            resp = requests.get('{base}/{version}/version'.format(base=app.config['system_config']['dirbs_core']['base_url'], version=app.config['system_config']['dirbs_core']['version']))  # dirbs core imei api call
+            resp = requests.get('{base}/{version}/version'.format(base=app.config['dev_config']['dirbs_core']['base_url'], version=app.config['dev_config']['dirbs_core']['version']))  # dirbs core imei api call
             if resp.status_code == 200:
                 data = {
                     "core_status": "CORE connected successfully."
