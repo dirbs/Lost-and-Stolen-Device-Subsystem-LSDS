@@ -27,7 +27,7 @@ from flask_restful import Api
 from .resources.common import BaseRoutes
 from .resources.admin import FetchImei, FetchMsisdn
 from .resources.system import IncidentNature, CaseStatus
-from .resources.case import CaseRoutes, CaseList, InsertCase
+from .resources.case import CaseRoutes, CaseList, InsertCase, UpdateCase
 from .resources.search import Search
 from .resources.stolen_list import StolenList
 
@@ -54,6 +54,8 @@ api.add_resource(CaseRoutes, '/case/<tracking_id>')
 # noinspection PyTypeChecker
 api.add_resource(InsertCase, '/case')
 # noinspection PyTypeChecker
+api.add_resource(UpdateCase, '/update_case/<tracking_id>')
+# noinspection PyTypeChecker
 api.add_resource(CaseList, '/cases')
 # noinspection PyTypeChecker
 api.add_resource(Search, '/search')
@@ -65,8 +67,9 @@ docs = apidoc.init_doc()
 
 def register():
     """Method to register routes for docs."""
-    for route in [BaseRoutes, FetchImei, FetchMsisdn, IncidentNature, CaseStatus, CaseList, CaseStatus, Search,
-                  CaseRoutes, InsertCase]:
+    for route in [BaseRoutes, FetchImei, FetchMsisdn, IncidentNature, CaseStatus, CaseList, Search,
+                  CaseRoutes, InsertCase, UpdateCase]:
         docs.register(route)
+
 
 register()

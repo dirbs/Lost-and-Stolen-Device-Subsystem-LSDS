@@ -27,7 +27,7 @@ from app import app, db
 from ..assets.response import MIME_TYPES, CODES, MESSAGES
 from ..models.case import Case
 from ..assets.pagination import Pagination
-from ..schema.case import CaseInsertSchema, CaseStatusUpdateSchema, CaseUpdateSchema, CasesSchema
+from ..schema.case import CaseInsertSchema, CaseStatusUpdateSchema, CaseUpdateSchema, CasesSchema, CaseGetBlockedSchema
 
 from flask import Response
 from sqlalchemy import desc
@@ -145,8 +145,8 @@ class CaseRoutes(MethodResource):
 
             if case_id == 406:
                 data = {
-                    'message': 'Case updation not allowed in this status',
-                }
+                        'message': 'Unable to update case status. Either Blocking is disabled or case has already been recovered.',
+                    }
                 response = Response(json.dumps(data), status=CODES.get("NOT_ACCEPTABLE"),
                                     mimetype=MIME_TYPES.get("APPLICATION_JSON"))
                 return response
@@ -352,6 +352,56 @@ class InsertCase(MethodResource):
                 'message': 'case addition failed'
             }
 
+            response = Response(json.dumps(data), status=CODES.get('INTERNAL_SERVER_ERROR'),
+                                mimetype=MIME_TYPES.get('APPLICATION_JSON'))
+            return response
+
+
+class UpdateCase(MethodResource):
+    @doc(description='Update case information', tags=['Case'])
+    @use_kwargs(CaseGetBlockedSchema().fields_dict, locations=['json'])
+    def patch(self, tracking_id, **args):
+        """Update case status."""
+
+        try:
+            case_id = Case.update_blocked_info(args, tracking_id)
+
+            if case_id == 406:
+                data = {
+                    'message': 'Case updation not allowed in this status',
+                }
+                response = Response(json.dumps(data), status=CODES.get("NOT_ACCEPTABLE"),
+                                    mimetype=MIME_TYPES.get("APPLICATION_JSON"))
+                return response
+
+            if case_id == 409:
+                data = {
+                    'message': 'Case already has the same status.',
+                }
+                response = Response(json.dumps(data), status=CODES.get("CONFLICT"),
+                                    mimetype=MIME_TYPES.get("APPLICATION_JSON"))
+                return response
+
+            if case_id:
+                data = {'message': 'Case status updated', 'tracking_id': tracking_id}
+                response = Response(json.dumps(data), status=CODES.get("OK"),
+                                    mimetype=MIME_TYPES.get("APPLICATION_JSON"))
+                return response
+            else:
+                data = {
+
+                    "tracking_id": tracking_id,
+                    "message": "Case not found"
+
+                }
+
+                response = Response(json.dumps(data), status=CODES.get("NOT_FOUND"),
+                                    mimetype=MIME_TYPES.get("APPLICATION_JSON"))
+                return response
+
+        except Exception as e:
+            app.logger.exception(e)
+            data = {'message': 'Update of case information failed!'}
             response = Response(json.dumps(data), status=CODES.get('INTERNAL_SERVER_ERROR'),
                                 mimetype=MIME_TYPES.get('APPLICATION_JSON'))
             return response

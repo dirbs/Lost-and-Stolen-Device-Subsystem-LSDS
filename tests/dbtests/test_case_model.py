@@ -29,6 +29,9 @@ from app.api.v1.models.case import Case
 def test_case_insertion(session):
     """Test case insertion"""
     data = {
+        "case_details": {
+            "get_blocked": True
+        },
         "loggedin_user": {
             "user_id": "1215c23-3f64-4af5-8713-35782374713d",
             "username": "muazzama anwar"
@@ -88,6 +91,9 @@ def test_case_insertion(session):
 def test_update_case(session):
     """Test case information update"""
     data = {
+        "case_details": {
+            "get_blocked": True
+        },
         "loggedin_user": {
             "user_id": "1215c23-3f64-4af5-8713-35782374713d",
             "username": "muazzama anwar"
@@ -167,6 +173,9 @@ def test_update_case(session):
 def test_update_case_status(session):
     """Test update case status"""
     data = {
+        "case_details": {
+            "get_blocked": True
+        },
         "loggedin_user": {
             "user_id": "1215c23-3f64-4af5-8713-35782374713d",
             "username": "muazzama anwar"

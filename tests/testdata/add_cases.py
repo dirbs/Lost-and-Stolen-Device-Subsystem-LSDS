@@ -28,6 +28,9 @@ import json
 case_api_url = 'api/v1/case'
 
 data = {
+    "case_details": {
+        "get_blocked": True
+    },
   "loggedin_user": {
     "user_id": "1215c23-3f64-4af5-8713-35782374713d",
     "username": "muazzama anwar"
@@ -177,15 +180,3 @@ def blocked_cases(flask_app):
     status['status_args']['case_status'] = 2
     response = flask_app.patch(case_api_url + '/' + tracking_id, data=json.dumps(status), content_type='application/json')
     assert response.status_code == 200
-
-
-# def test_all_cases(flask_app):
-#     recovered_cases(flask_app)
-#     response = flask_app.get(case_api_url, content_type='application/json')
-#     assert response.status_code == 200
-#     assert response.mimetype == 'application/json'
-#
-#     response = json.loads(response.get_data(as_text=True))
-#     print(response)
-#     assert response['count'] >= 10
-#

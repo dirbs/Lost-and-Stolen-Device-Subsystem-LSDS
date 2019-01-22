@@ -28,42 +28,45 @@ import json
 case_api_url = 'api/v1/case'
 
 creation_data = {
-  "loggedin_user": {
-    "user_id": "1215c23-3f64-4af5-8713-35782374713d",
-    "username": "muazzama anwar"
-  },
-  "incident_details": {
-    "incident_date": "2018-02-02",
-    "incident_nature": 2
-  },
-  "personal_details": {
-    "full_name": "test user",
-    "gin": "44103-7789877-2",
-    "address": "test address pakistan",
-    "email": "test@email.com",
-    "dob": "1991-02-02",
-    "number": "03301111112"
-  },
-  "device_details": {
-    "brand": "huawei",
-    "model_name": "huawei mate 10",
-    "description": "blue",
-    "imeis": [
-      "37006234512340",
-      "37006234512341"
-    ],
-    "msisdns": [
-      "00923323471007",
-      "00923442346511"
-    ]
-  }
+    "case_details": {
+        "get_blocked": True
+    },
+    "loggedin_user": {
+        "user_id": "1215c23-3f64-4af5-8713-35782374713d",
+        "username": "muazzama anwar"
+    },
+    "incident_details": {
+        "incident_date": "2018-02-02",
+        "incident_nature": 2
+    },
+    "personal_details": {
+        "full_name": "test user",
+        "gin": "44103-7789877-2",
+        "address": "test address pakistan",
+        "email": "test@email.com",
+        "dob": "1991-02-02",
+        "number": "03301111112"
+    },
+    "device_details": {
+        "brand": "huawei",
+        "model_name": "huawei mate 10",
+        "description": "blue",
+        "imeis": [
+          "37006234512340",
+          "37006234512341"
+        ],
+        "msisdns": [
+          "00923323471007",
+          "00923442346511"
+        ]
+    }
 }
 
 data = {
   "status_args": {
-  "user_id": "12132-cds3213-d3242",
-  "case_comment": "case updated",
-  "username": "abc"
+      "user_id": "12132-cds3213-d3242",
+      "case_comment": "case updated",
+      "username": "abc"
 },
   "personal_details": {
     "full_name": "yasir zeeshan",

@@ -28,6 +28,9 @@ import json
 case_api_url = 'api/v1/case'
 
 data = {
+    "case_details": {
+            "get_blocked": True
+        },
   "loggedin_user": {
     "user_id": "1215c23-3f64-4af5-8713-35782374713d",
     "username": "muazzama anwar"
@@ -112,6 +115,9 @@ def test_duplicate_case(flask_app):
 def test_pd_input_criteria(flask_app):
     """Tests personal details input validation"""
     data = {
+        "case_details": {
+            "get_blocked": True
+        },
         "loggedin_user": {
             "user_id": "1215c23-3f64-4af5-8713-35782374713d",
             "username": "muazzama anwar"

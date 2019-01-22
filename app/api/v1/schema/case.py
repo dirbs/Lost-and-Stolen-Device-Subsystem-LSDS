@@ -2,6 +2,11 @@ from marshmallow import fields, Schema, pre_dump
 from .validations import *
 
 
+class CaseDetailsSchema(Schema):
+    """Case details"""
+    get_blocked = fields.Boolean(required=True)
+
+
 class UserSchema(Schema):
     """User schema."""
     user_id = fields.Str(required=True)
@@ -37,6 +42,7 @@ class DeviceDetailsSchema(Schema):
 
 class CaseInsertSchema(Schema):
     """Case Insertion schema."""
+    case_details = fields.Nested(CaseDetailsSchema)
     loggedin_user = fields.Nested(UserSchema, only=['username', 'user_id'])
     incident_details = fields.Nested(IncidentDetailsSchema)
     personal_details = fields.Nested(PersonalDetailsSchema)
@@ -51,7 +57,18 @@ class CaseInsertSchema(Schema):
 class CaseUpdateSchema(Schema):
     """Update case schema."""
     status_args = fields.Nested(UserSchema, only=['username', 'user_id', 'case_comment'], required=True)
-    personal_details = fields.Nested(PersonalDetailsSchema, required=True)
+    personal_details = fields.Nested(PersonalDetailsSchema)
+
+    @property
+    def fields_dict(self):
+        """Convert declared fields to dictionary."""
+        return self._declared_fields
+
+
+class CaseGetBlockedSchema(Schema):
+    """Update case schema."""
+    status_args = fields.Nested(UserSchema, only=['username', 'user_id', 'case_comment'], required=True)
+    case_details = fields.Nested(CaseDetailsSchema)
 
     @property
     def fields_dict(self):

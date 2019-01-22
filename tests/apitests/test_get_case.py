@@ -28,6 +28,9 @@ import json
 case_api_url = 'api/v1/case'
 
 data = {
+    "case_details": {
+            "get_blocked": True
+        },
   "loggedin_user": {
     "user_id": "1215c23-3f64-4af5-8713-35782374713d",
     "username": "muazzama anwar"

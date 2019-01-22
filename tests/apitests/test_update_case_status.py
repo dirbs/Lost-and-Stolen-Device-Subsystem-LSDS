@@ -27,6 +27,9 @@ import json
 case_api_url = 'api/v1/case'
 
 creation_data = {
+    "case_details": {
+            "get_blocked": True
+        },
   "loggedin_user": {
     "user_id": "1215c23-3f64-4af5-8713-35782374713d",
     "username": "muazzama anwar"
@@ -151,9 +154,6 @@ def test_case_status_update_conflict(flask_app):
     response = flask_app.patch(case_api_url + '/' + tracking_id, data=json.dumps(data), content_type='application/json')
     assert response.status_code == 406
     assert response.mimetype == 'application/json'
-
-    response = json.loads(response.get_data(as_text=True))
-    assert response['message'] == "Case updation not allowed in this status"
 
 
 def test_case_not_found(flask_app):
