@@ -32,6 +32,14 @@ def test_imei_gsma_reg(dirbs_core_mock, flask_app):
     response = flask_app.get(imei_api_url+'/12345678901234', content_type='application/json')
     assert response.status_code == 200
     assert response.mimetype == 'application/json'
+    resp = json.loads(response.get_data(as_text=True))
+    assert resp.get('gsma') is not None
+    assert resp['gsma']['radio_access_technology'] == "radio_interface"
+    assert resp['gsma']['model_number'] == "modelnumber"
+    assert resp['gsma']['operating_system'] is None
+    assert resp['gsma']['device_type'] == "devicetype"
+    assert resp['gsma']['brand'] == "brandsname"
+    assert resp['gsma']['model_name'] == "model"
 
 
 def test_imei_gsma(dirbs_core_mock, flask_app):
@@ -39,6 +47,14 @@ def test_imei_gsma(dirbs_core_mock, flask_app):
     response = flask_app.get(imei_api_url+'/12345678904321', content_type='application/json')
     assert response.status_code == 200
     assert response.mimetype == 'application/json'
+    resp = json.loads(response.get_data(as_text=True))
+    assert resp.get('gsma') is not None
+    assert resp['gsma']['radio_access_technology'] == "sample-bands-data"
+    assert resp['gsma']['model_number'] == "sample-marketing-name"
+    assert resp['gsma']['operating_system'] is None
+    assert resp['gsma']['device_type'] == "sample-device-type"
+    assert resp['gsma']['brand'] == "sample-brand-name"
+    assert resp['gsma']['model_name'] == "sample-model-name"
 
 
 def test_imei_reg(dirbs_core_mock, flask_app):
@@ -46,6 +62,13 @@ def test_imei_reg(dirbs_core_mock, flask_app):
     response = flask_app.get(imei_api_url+'/87654321904321', content_type='application/json')
     assert response.status_code == 200
     assert response.mimetype == 'application/json'
+    resp = json.loads(response.get_data(as_text=True))
+    assert resp['gsma']['radio_access_technology'] == "radio_interface"
+    assert resp['gsma']['model_number'] == "modelnumber"
+    assert resp['gsma']['operating_system'] is None
+    assert resp['gsma']['device_type'] == "devicetype"
+    assert resp['gsma']['brand'] == "brandsname"
+    assert resp['gsma']['model_name'] == "model"
 
 
 def test_imei(dirbs_core_mock, flask_app):
@@ -53,13 +76,17 @@ def test_imei(dirbs_core_mock, flask_app):
     response = flask_app.get(imei_api_url+'/87654321901234', content_type='application/json')
     assert response.status_code == 200
     assert response.mimetype == 'application/json'
+    resp = json.loads(response.get_data(as_text=True))
+    assert resp.get('gsma') is None
 
 
-def test_imei_502(dirbs_core_mock, flask_app):
+def test_gsma_failure(dirbs_core_mock, flask_app):
     """Test IMEI in case of GSMA and registration call failure"""
     response = flask_app.get(imei_api_url+'/89764532901234', content_type='application/json')
     assert response.status_code == 200
     assert response.mimetype == 'application/json'
+    resp = json.loads(response.get_data(as_text=True))
+    assert resp.get('gsma') is None
 
 
 def test_imei_request_method(flask_app):
@@ -80,17 +107,17 @@ def test_imei_input_format(flask_app):
     # IMEI having more than 16 characters
     response = flask_app.get(imei_api_url+'/12344329x00060000', content_type='application/json')
     assert response.status_code == 400
-    assert json.loads(response.get_data(as_text=True))["message"] == "imei too long, cannot contain more than 16 characters"
+    assert json.loads(response.get_data(as_text=True))["message"] is not None
 
     # IMEI having invalid characters
     response = flask_app.get(imei_api_url+'/1234567890123s3', content_type='application/json')
     assert response.status_code == 400
-    assert json.loads(response.get_data(as_text=True))['message'] == "invalid imei"
+    assert json.loads(response.get_data(as_text=True))['message'] is not None
 
     # IMEI having less than 14 characters
     response = flask_app.get(imei_api_url+'/12344329000', content_type='application/json')
     assert response.status_code == 400
-    assert json.loads(response.get_data(as_text=True))["message"] == "imei too short, should contain at least 14 characters"
+    assert json.loads(response.get_data(as_text=True))["message"] is not None
 
 
 def test_imei_failure_resp(dirbs_core_mock, flask_app):

@@ -20,7 +20,7 @@
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-PyYAML==3.12
+PyYAML==3.13
 sqlalchemy==1.2.8
 flask==1.0.2
 flask-restful==0.3.6

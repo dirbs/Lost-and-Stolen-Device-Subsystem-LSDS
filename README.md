@@ -60,54 +60,41 @@ environment:
 * Create database using Postgresql (Name and credentials should be same as in [config](tests/testdata/config.ini))
 * Create virtual environment using **virtualenv** and activate it:
 ```bash
+pip3 install virtualenv 
 virtualenv venv
 source venv/bin/activate
 ```
+Make sure the virtual environment is made using python3
 
-* Install the project requirements
+* Create /uploads folder in / directory
+
+* Replace sample configuration in config.ini to similar configurations in (tests/testdata/config.ini)
+
+* Run Database migrations using:
+
 ```bash
-$ pip install -r requirements.txt
+make install-db
 ```
-* Replace sample configuration in config.ini to configurations in (tests/testdata/config.ini)
+
+This will automatically create and migrate database schemas and requirements.
 
 * Start LSDS development server using:
+
 ```bash
-python run.py
+make start-dev
 ```
 
-* Create migration repository 	
+This will start a flask development environment for LSDS.
+
+* To run tests create another user other than root user.
+* To run unit tests, run:
+
 ```bash
-$ python manage.py db init
+make test
 ```
 
-* Generate initial migration	
-```bash
-$ python manage.py db migrate
-```
+* To lint the code using pylint, simply run:
 
-* Apply migrations to the database
 ```bash
-$ python manage.py db upgrade
-```
-
-* Create function and trigger in db
-```bash
-$ python manage.py DbTrigger 
-```
-
-* Create view in db for search
-```bash
-$ python manage.py CreateView
-```
-
-* Seed data in db
-```bash
-$ python manage.py Seed
-```
-
-**Note:** After making changes in the schema only run step 2 and 3.
-
-* To run unit tests, run
-```bash
-$ pytest -v
+make lint
 ```

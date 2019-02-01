@@ -32,6 +32,7 @@ from flask_migrate import Migrate, MigrateCommand
 from app.api.v1.models import *
 from app.api.v1.seeders.seeder import Seeds
 from app import app, db
+from scripts.stolen_list import GenList
 
 migrate = Migrate(app, db)
 manager = Manager(app)
@@ -93,6 +94,11 @@ def DbTrigger():
         trigger = 'create trigger insert_tracking_id_trigger after insert on public.case referencing new table as "case" for each row execute procedure tracking_id_function()'
         db.engine.execute(trigger)
         return "Function created successfully"
+
+
+@manager.command
+def genlist():
+    return GenList.create_list()
 
 
 if __name__ == '__main__':

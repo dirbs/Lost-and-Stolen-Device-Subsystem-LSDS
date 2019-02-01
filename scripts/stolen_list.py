@@ -24,25 +24,19 @@
 #######################################################################################################################
 
 import os
-import json
 
 from app import db, app
-from flask import Response, send_from_directory
-from flask_restful import Resource
 import pandas as pd
 from collections import OrderedDict
 
-from ..models.delta_list import DeltaList
-from ..assets.error_handlers import MIME_TYPES, CODES
+from app.api.v1.models.delta_list import DeltaList
 
 
-class StolenList(Resource):
-    """Flask resource for delta stolen list."""
+class GenList:
+    """Class for list generation."""
 
     @staticmethod
-    def get():
-        """Generates delta stolen list."""
-
+    def get_distinct_imeis():
         try:
             response_data = []  # distinct imeis list
             done = set()  # set of distinct IMEIs
@@ -53,8 +47,19 @@ class StolenList(Resource):
                 if data['imei'] not in done:  # save distinct imeis
                     done.add(data['imei'])  # note it down for further iterations
                     response_data.append(data)  # append distinct imei
+            return response_data
+        except Exception as e:
+            app.logger.critical("Exception occurred while getting distinct imeis in list generation process")
+            app.logger.exception(e)
+            return "Exception occurred while getting distinct imeis."
+
+    @staticmethod
+    def create_list():
+        """Generates delta stolen list."""
+        try:
+            resp = GenList.get_distinct_imeis()
             delta_list = []  # delta list
-            for data in response_data:  # iterate distince imeis
+            for data in resp:  # iterate distince imeis
                 sql = "select imei, status from delta_list where imei='"+data.get('imei')+"'"
                 query = db.engine.execute(sql)  # check if imei already exists in delta list model
                 result = list(query)
@@ -81,19 +86,24 @@ class StolenList(Resource):
 
                         delta_list.append(record)  # append record to delta list
                         DeltaList.insert(data.get('imei'), data.get('case_status'))  # insert new entry in delta list model
-            stolen_delta_list = pd.DataFrame(delta_list)
-            report_name = 'stolen_delta_list.csv'
-            if not stolen_delta_list.empty:
-                stolen_delta_list.to_csv(os.path.join(app.config['dev_config']['UPLOADS']['list_dir'], report_name), sep=',', index=False)  # writing stolen list to .csv file
-            return send_from_directory(directory=app.config['dev_config']['UPLOADS']['list_dir'], filename=report_name)  # returns downloadable file
+            return GenList.upload_list(delta_list)
         except Exception as e:
             app.logger.critical("exception encountered during delta list generation, see blow logs")
             app.logger.exception(e)
-            data = {
-                "message": "Database connectivity error."
-            }
-            response = Response(json.dumps(data), status=CODES.get("INTERNAL_SERVER_ERROR"),
-                                mimetype=MIME_TYPES.get("APPLICATION_JSON"))
-            return response
+            return "Exception occurred check logs."
         finally:
             db.session.close()
+
+    @staticmethod
+    def upload_list(list):
+        try:
+            stolen_delta_list = pd.DataFrame(list)
+            report_name = 'stolen_delta_list.csv'
+            if not stolen_delta_list.empty:
+                stolen_delta_list.to_csv(os.path.join(app.config['dev_config']['UPLOADS']['list_dir'], report_name), sep=',', index=False)  # writing stolen list to .csv file
+                return "List has been saved successfully."
+            return "Delta list not generated due to no new records found you can see previous version of list."
+        except Exception as e:
+            app.logger.critical("Exception occurred while uploading delta list")
+            app.logger.exception(e)
+            return "Exception occurred while uploading list."

@@ -25,24 +25,19 @@
 from os import path
 import pandas as pd
 from app.api.v1.models.delta_list import DeltaList
-
-list_api_url = 'api/v1/stolenlist'
-upload_dir = path.dirname(path.dirname(__file__))
+from scripts.stolen_list import GenList
 
 
-def test_list_gen_new_imeis(flask_app):
+def test_list_gen_new_imeis(app):
     """Test list generation with new IMEIs"""
-    response = flask_app.get(list_api_url, content_type='application/json')
-    assert response.status_code == 200
-    assert response.mimetype == 'text/csv'
-
-    report = path.join(upload_dir+"/uploads", "stolen_delta_list.csv")
+    assert GenList.create_list()=="List has been saved successfully."
+    report = path.join(app.config['dev_config']['UPLOADS']['list_dir'], "stolen_delta_list.csv")
     task_file = pd.read_csv(report, sep=',', index_col=0)
     task_list = task_file.to_dict(orient='records')
     assert len(task_list) >= 10
 
 
-def test_list_gen_existing_imeis(flask_app):
+def test_list_gen_existing_imeis(app, flask_app):
     """Test list generation with existing IMEIs"""
     data = [
         {
@@ -80,39 +75,9 @@ def test_list_gen_existing_imeis(flask_app):
     ]
     for d in data:
         DeltaList.insert(d.get('imei'), d.get('case_status'))
-    response = flask_app.get(list_api_url, content_type='application/json')
-    assert response.status_code == 200
-    assert response.mimetype == 'text/csv'
+    assert GenList.create_list()=="List has been saved successfully."
 
-    report = path.join(upload_dir+"/uploads", "stolen_delta_list.csv")
+    report = path.join(app.config['dev_config']['UPLOADS']['list_dir'], "stolen_delta_list.csv")
     task_file = pd.read_csv(report, sep=',', index_col=0)
     task_list = task_file.to_dict(orient='records')
     assert len(task_list) >= 6
-
-
-def test_list_post_method(flask_app):
-    """Test post request"""
-    response = flask_app.post(list_api_url, content_type='application/json')
-    assert response.status_code == 405
-    assert response.mimetype == 'application/json'
-
-
-def test_list_put_method(flask_app):
-    """Test put request"""
-    response = flask_app.put(list_api_url, content_type='application/json')
-    assert response.status_code == 405
-    assert response.mimetype == 'application/json'
-
-
-def test_list_patch_method(flask_app):
-    """Test patch request"""
-    response = flask_app.patch(list_api_url, content_type='application/json')
-    assert response.status_code == 405
-    assert response.mimetype == 'application/json'
-
-
-def test_list_delete_method(flask_app):
-    """Test delete request"""
-    response = flask_app.delete(list_api_url, content_type='application/json')
-    assert response.status_code == 405
-    assert response.mimetype == 'application/json'

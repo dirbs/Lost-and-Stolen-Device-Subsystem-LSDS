@@ -20,6 +20,7 @@ Copyright (c) 2018 Qualcomm Technologies, Inc.
  POSSIBILITY OF SUCH DAMAGE.
 """
 from os import path
+import shutil
 import json
 import copy
 import pytest
@@ -32,7 +33,7 @@ import yaml
 
 # pylint: disable=redefined-outer-name
 @pytest.yield_fixture(scope='session')
-def app():
+def app(tmpdir_factory):
     """Method to create an app for testing."""
     # need to import this late as it might have side effects
     from app import app as app_
@@ -46,27 +47,30 @@ def app():
     old_config = copy.copy(app_.config)
 
     # update configuration file path
-    global_config = yaml.load(open(path.abspath(path.dirname(__file__) + "/testdata/config.yml")))
+    global_config = yaml.safe_load(open(path.abspath(path.dirname(__file__) + "/testdata/config.yml")))
     app_.config['system_config'] = global_config
 
     # update configuration file path
     config = configparser.ConfigParser()
     config.read(path.abspath(path.dirname(__file__) + "/testdata/config.ini"))
 
+    temp_lists = tmpdir_factory.mktemp('uploads')
+
     # update upload directories path
     app_.config['dev_config'] = config
-    app_.config['dev_config']['UPLOADS']['list_dir'] = path.abspath(path.dirname(__file__) + "/uploads")
+    app_.config['dev_config']['UPLOADS']['list_dir'] = str(temp_lists)
 
     # initialize temp database and yield app
-    with Postgresql() as postgresql:
-        app_.config['SQLALCHEMY_DATABASE_URI'] = postgresql.url()
-        yield app_
+    postgresql = Postgresql()
+    app_.config['SQLALCHEMY_DATABASE_URI'] = postgresql.url()
+    yield app_
 
-        # restore old configs after successful session
-        app_.url_map = old_url_map
-        app_.view_functions = old_view_functions
-        app_.config = old_config
-        postgresql.stop()
+    # restore old configs after successful session
+    app_.url_map = old_url_map
+    app_.view_functions = old_view_functions
+    app_.config = old_config
+    shutil.rmtree(path=str(temp_lists))
+    postgresql.stop()
 
 
 @pytest.fixture(scope='session')
@@ -128,7 +132,7 @@ def mocked_config():
     """Fixture for mocking configuration for tests."""
     mocked_config_path = path.abspath(path.dirname(__file__) + '/testdata/config.yml')
     with open(mocked_config_path) as f:
-        data = yaml.load(f)
+        data = yaml.safe_load(f)
         yield data
 
 
@@ -425,7 +429,7 @@ def dirbs_core_mock(app, mocked_tac_data, mocked_imei_data, mocked_reg_data, moc
 
     # mock dirbs core MSISDN call
     httpretty.register_uri(httpretty.GET,
-                           r'{0}/{1}/msisdn/03358276012'.format(dirbs_core_api, dirbs_core_api_version),
+                           r'{0}/{1}/msisdn/02258276012'.format(dirbs_core_api, dirbs_core_api_version),
                            body=json.dumps(mocked_msisdn_data), content_type='application/json', status=200)
 
     # mock dirbs core version call

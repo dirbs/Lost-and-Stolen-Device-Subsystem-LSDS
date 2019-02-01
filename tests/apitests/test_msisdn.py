@@ -29,20 +29,20 @@ msisdn_api_url = '/api/v1/msisdn'
 
 def test_msisdn(dirbs_core_mock, flask_app):
     """Test MSISDN success response"""
-    response = flask_app.get(msisdn_api_url+'/03358276012', content_type='application/json')
+    response = flask_app.get(msisdn_api_url+'/02258276012', content_type='application/json')
     assert response.status_code == 200
     assert response.mimetype == 'application/json'
 
 
 def test_msisdn_request_method(flask_app):
     """Test MSISDN allowed request methods"""
-    response = flask_app.post(msisdn_api_url+'/03358276012', content_type='application/json')
+    response = flask_app.post(msisdn_api_url+'/02258276012', content_type='application/json')
     assert response.status_code == 405
-    response = flask_app.put(msisdn_api_url+'/03358276012', content_type='application/json')
+    response = flask_app.put(msisdn_api_url+'/02258276012', content_type='application/json')
     assert response.status_code == 405
-    response = flask_app.patch(msisdn_api_url+'/03358276012', content_type='application/json')
+    response = flask_app.patch(msisdn_api_url+'/02258276012', content_type='application/json')
     assert response.status_code == 405
-    response = flask_app.delete(msisdn_api_url+'/03358276012', content_type='application/json')
+    response = flask_app.delete(msisdn_api_url+'/02258276012', content_type='application/json')
     assert response.status_code == 405
 
 
@@ -55,6 +55,6 @@ def test_msisdn_input_format(flask_app):
 
 def test_msisdn_response(dirbs_core_mock, flask_app):
     """Test MSISDN response"""
-    response = flask_app.get(msisdn_api_url+'/03358276012', content_type='application/json')
+    response = flask_app.get(msisdn_api_url+'/02258276012', content_type='application/json')
     response = json.loads(response.get_data(as_text=True))
     assert len(response.get('results')) == 3

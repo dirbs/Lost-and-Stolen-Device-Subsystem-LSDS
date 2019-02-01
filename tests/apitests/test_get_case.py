@@ -31,35 +31,29 @@ data = {
     "case_details": {
             "get_blocked": True
         },
-  "loggedin_user": {
-    "user_id": "1215c23-3f64-4af5-8713-35782374713d",
-    "username": "muazzama anwar"
-  },
-  "incident_details": {
-    "incident_date": "2018-02-02",
-    "incident_nature": 2
-  },
-  "personal_details": {
-    "full_name": "test user",
-    "gin": "44103-7789877-2",
-    "address": "test address pakistan",
-    "email": "test@email.com",
-    "dob": "1991-02-02",
-    "number": "03301111112"
-  },
-  "device_details": {
-    "brand": "huawei",
-    "model_name": "huawei mate 10",
-    "description": "blue",
-    "imeis": [
-      "37006234500020",
-      "37006234530201"
-    ],
-    "msisdns": [
-      "00923323471007",
-      "00923442346511"
-    ]
-  }
+    "loggedin_user": {
+        "user_id": "1215c23-3f64-4af5-8713-35782374713d",
+        "username": "muazzama anwar"
+    },
+    "incident_details": {
+        "incident_date": "2018-02-02",
+        "incident_nature": 2
+    },
+    "personal_details": {
+        "full_name": "test user",
+        "gin": "44103-7789877-2",
+        "address": "test address pakistan",
+        "email": "test@email.com",
+        "dob": "1991-02-02",
+        "number": "03301111112"
+    },
+    "device_details": {
+        "brand": "huawei",
+        "model_name": "huawei mate 10",
+        "description": "blue",
+        "imeis": ["37006234500020", "37006234530201"],
+        "msisdns": ["00923323471007", "00923442346511"]
+    }
 }
 
 
@@ -73,6 +67,17 @@ def test_get_case(flask_app):
     response = flask_app.get(case_api_url+'/'+response, content_type='application/json')
     assert response.status_code == 200
     assert response.mimetype == 'application/json'
+    resp = json.loads(response.get_data(as_text=True))
+    assert resp.get('creator') is not None
+    assert resp.get('status') is not None
+    assert resp.get('updated_at') is not None
+    assert resp.get('created_at') is not None
+    assert resp.get('comments') is not None
+    assert resp.get('tracking_id') is not None
+    assert resp.get('incident_details') is not None
+    assert resp.get('personal_details') is not None
+    assert resp.get('device_details') is not None
+    assert resp.get('get_blocked') is not None
 
 
 def test_get_case_response(flask_app):
@@ -90,9 +95,19 @@ def test_get_case_response(flask_app):
     response = json.loads(response.get_data(as_text=True))
     assert response['incident_details'] == {'incident_nature': 'Lost', 'incident_date': '2018-02-02'}
     assert response['status'] == 'Pending'
-    assert response['personal_details'] == {'gin': '44103-7789877-2', 'dob': '1991-02-02', 'full_name': 'test user', 'number': '03301111112', 'address': 'test address pakistan', 'email': 'test@email.com'}
+    assert response['personal_details'] == {'gin': '44103-7789877-2',
+                                            'dob': '1991-02-02',
+                                            'full_name': 'test user',
+                                            'number': '03301111112',
+                                            'address': 'test address pakistan',
+                                            'email': 'test@email.com'}
     assert response['creator'] == {'user_id': '1215c23-3f64-4af5-8713-35782374713d', 'username': 'muazzama anwar'}
-    assert response['device_details'] == {'brand': 'huawei', 'model_name': 'huawei mate 10', 'msisdns': ['00923323471007', '00923442346511'], 'imeis': ['37006234501234', '37006234531234'], 'description': 'blue'}
+    assert response['device_details'] == {'brand': 'huawei',
+                                          'model_name': 'huawei mate 10',
+                                          'msisdns': ['00923323471007', '00923442346511'],
+                                          'imeis': ['37006234501234', '37006234531234'],
+                                          'description': 'blue'}
+    assert response['get_blocked']
 
 
 def test_case_not_found(flask_app):
