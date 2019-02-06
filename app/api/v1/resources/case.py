@@ -361,7 +361,7 @@ class UpdateCase(MethodResource):
     @doc(description='Update case information', tags=['Case'])
     @use_kwargs(CaseGetBlockedSchema().fields_dict, locations=['json'])
     def patch(self, tracking_id, **args):
-        """Update case status."""
+        """Update case get blocked information."""
 
         try:
             case_id = Case.update_blocked_info(args, tracking_id)
@@ -371,14 +371,6 @@ class UpdateCase(MethodResource):
                     'message': 'Case updation not allowed in this status',
                 }
                 response = Response(json.dumps(data), status=CODES.get("NOT_ACCEPTABLE"),
-                                    mimetype=MIME_TYPES.get("APPLICATION_JSON"))
-                return response
-
-            if case_id == 409:
-                data = {
-                    'message': 'Case already has the same status.',
-                }
-                response = Response(json.dumps(data), status=CODES.get("CONFLICT"),
                                     mimetype=MIME_TYPES.get("APPLICATION_JSON"))
                 return response
 

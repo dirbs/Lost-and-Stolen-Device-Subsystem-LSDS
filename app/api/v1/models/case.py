@@ -218,7 +218,7 @@ class Case(db.Model):
 
     @classmethod
     def update_blocked_info(cls, args, tracking_id):
-        """Update personal details by tracking id."""
+        """Update case get blocked information by tracking id."""
         try:
             case = cls.query.filter_by(tracking_id=tracking_id).first()
             if case:
