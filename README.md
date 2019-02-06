@@ -98,3 +98,35 @@ make test
 ```bash
 make lint
 ```
+
+###Other useful commands
+
+* To install a fresh database:
+
+```bash
+make install-db
+```
+
+* To Upgrade already installed database:
+
+```bash
+make upgrade-db
+```
+
+* To generate delta stolen list for DIRBS Core:
+
+```bash
+make gen-list
+```
+
+* To run unit tests:
+
+```bash
+make test
+```
+
+* To run code linting:
+
+```bash
+make lint
+```
