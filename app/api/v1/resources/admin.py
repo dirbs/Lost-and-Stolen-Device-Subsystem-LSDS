@@ -29,6 +29,7 @@ import requests
 from app import app
 from flask import Response, request
 from flask_apispec import MethodResource, doc
+from flask_babel import _
 
 from ..assets.response import MIME_TYPES, CODES
 from ..requests.args_validation import validate_imei, validate_msisdn
@@ -65,12 +66,12 @@ class FetchImei(MethodResource):
                 return response
             else:
                 data = {
-                    "message": "Failed to retrieve IMEI response from core system."
+                    _("message"): [_("Failed to retrieve IMEI response from core system.")]
                 }
                 return Response(json.dumps(data), status=CODES.get("SERVICE_UNAVAILABLE"), mimetype=MIME_TYPES.get("APPLICATION_JSON"))
         except ValueError as error:
             data = {
-                "message": str(error)
+                "message": [_(str(error))]
             }
 
             response = Response(json.dumps(data), status=CODES.get("BAD_REQUEST"),
@@ -79,11 +80,11 @@ class FetchImei(MethodResource):
         except Exception:
             app.logger.critical("exception encountered during GET api/v1/imei, see logs below")
             data = {
-                    "message": "Error generating IMEI response. Check dirbs core url."
+                    "message": [_("Error generating IMEI response. Check dirbs core url.")]
                 }
 
             response = Response(json.dumps(data), status=CODES.get("SERVICE_UNAVAILABLE"),
-                                    mimetype=MIME_TYPES.get("APPLICATION_JSON"))
+                                mimetype=MIME_TYPES.get("APPLICATION_JSON"))
             return response
 
 
@@ -132,14 +133,14 @@ class FetchMsisdn(MethodResource):
             return response
         except ValueError as error:
             data = {
-                    "message": str(error)
+                    "message": _(str(error))
                 }
             response = Response(json.dumps(data), status=CODES.get("BAD_REQUEST"),
-                                    mimetype=MIME_TYPES.get("APPLICATION_JSON"))
+                                mimetype=MIME_TYPES.get("APPLICATION_JSON"))
             return response
         except Exception:
             data = {
-                    "message": "Error generating MSISDN response. Check dirbs core url."
+                    "message": [_("Error generating MSISDN response. Check dirbs core url.")]
                 }
             response = Response(json.dumps(data), status=CODES.get("SERVICE_UNAVAILABLE"), mimetype=MIME_TYPES.get("APPLICATION_JSON"))
             return response

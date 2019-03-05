@@ -47,3 +47,7 @@ global:
 
 system:
   version: 'v1'
+
+language_support:
+  languages: ['en', 'id', 'ur']
+  default: 'en'

@@ -27,6 +27,7 @@ from app import app, db
 import json
 from datetime import datetime, timedelta
 from flask import Response
+from flask_babel import _
 from flask_apispec import use_kwargs, MethodResource, doc
 from ..assets.response import MIME_TYPES, CODES
 from ..assets.pagination import Pagination
@@ -138,7 +139,7 @@ class Search(MethodResource):
                         "cases": [],
                         "count": 0,
                         "limit": kwargs.get('limit', 2),
-                        "message": "service unavailable"
+                        "message": _("service unavailable")
                     }
             response = Response(json.dumps(data), status=CODES.get("SERVICE_UNAVAILABLE"),
                                 mimetype=MIME_TYPES.get('APPLICATION_JSON'))

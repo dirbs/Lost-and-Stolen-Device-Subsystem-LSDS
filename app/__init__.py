@@ -28,9 +28,10 @@ import sys
 import yaml
 import configparser
 
-from flask import Flask
+from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
+from flask_babel import Babel
 
 app = Flask(__name__)
 CORS(app)
@@ -64,6 +65,15 @@ try:
 
     db = SQLAlchemy()
     db.init_app(app)
+
+    app.config['BABEL_DEFAULT_LOCALE'] = global_config['language_support']['default']
+    app.config['LANGUAGES'] = global_config['language_support']['languages']
+    babel = Babel(app)
+
+
+    @babel.localeselector
+    def get_locale():
+        return request.accept_languages.best_match(app.config['LANGUAGES'])
 
     from app.api.v1.routes import *
 

@@ -28,6 +28,7 @@ import json
 from app import app
 from flask import Response
 from flask_apispec import MethodResource, doc, marshal_with
+from flask_babel import _
 
 from ..models.natureofincident import NatureOfIncident
 from ..models.status import Status
@@ -53,7 +54,7 @@ class IncidentNature(MethodResource):
             app.logger.exception(e)
 
             data = {
-                "message": "Database connectivity error. Please check connection parameters."
+                "message": _("Database connectivity error. Please check connection parameters.")
             }
 
             response = Response(json.dumps(data), status=CODES.get("INTERNAL_SERVER_ERROR"),
@@ -78,7 +79,7 @@ class CaseStatus(MethodResource):
             app.logger.exception(e)
 
             data = {
-                "message": "Database connectivity error. Please check connection parameters."
+                "message": _("Database connectivity error. Please check connection parameters.")
             }
 
             response = Response(json.dumps(data), status=CODES.get("INTERNAL_SERVER_ERROR"),

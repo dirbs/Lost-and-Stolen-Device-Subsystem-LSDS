@@ -24,6 +24,7 @@
 import json
 
 from app import app, db
+from flask_babel import _
 from ..assets.response import MIME_TYPES, CODES, MESSAGES
 from ..models.case import Case
 from ..assets.pagination import Pagination
@@ -52,7 +53,7 @@ class CaseRoutes(MethodResource):
                     data = {
 
                             "tracking_id": tracking_id,
-                            "message": "Case not found"
+                            "message": _("Case not found")
 
                             }
 
@@ -62,7 +63,7 @@ class CaseRoutes(MethodResource):
             else:
 
                 data = {
-                    "message": MESSAGES.get("UNDEFINED_TRACKING_ID")
+                    "message": _(MESSAGES.get("UNDEFINED_TRACKING_ID"))
                 }
 
                 response = Response(json.dumps(data), status=CODES.get("BAD_REQUEST"),
@@ -72,7 +73,7 @@ class CaseRoutes(MethodResource):
             app.logger.exception(e)
 
             data = {
-                "message": "Error retrieving case results. Please check tracking id or database connection."
+                "message": _("Error retrieving case results. Please check tracking id or database connection.")
             }
 
             response = Response(json.dumps(data), status=CODES.get("INTERNAL_SERVER_ERROR"),
@@ -88,7 +89,7 @@ class CaseRoutes(MethodResource):
 
             if case_id == 406:
                 data = {
-                    'message': 'Case updation not allowed in this status',
+                    'message': _('Case updation not allowed in this status'),
                 }
                 response = Response(json.dumps(data), status=CODES.get("NOT_ACCEPTABLE"),
                                     mimetype=MIME_TYPES.get("APPLICATION_JSON"))
@@ -98,7 +99,7 @@ class CaseRoutes(MethodResource):
                 data = {
 
                     "tracking_id": tracking_id,
-                    "message": "Enter at least one optional field with full name in personal details."
+                    "message": _("Enter at least one optional field with full name in personal details.")
 
                 }
 
@@ -108,7 +109,7 @@ class CaseRoutes(MethodResource):
 
             if case_id:
                 data = {
-                    'message': 'Case updated successfully',
+                    'message': _('Case updated successfully'),
                     'tracking_id': tracking_id
                 }
 
@@ -119,7 +120,7 @@ class CaseRoutes(MethodResource):
                 data = {
 
                     "tracking_id": tracking_id,
-                    "message": "Case not found"
+                    "message": _("Case not found")
 
                 }
 
@@ -129,7 +130,7 @@ class CaseRoutes(MethodResource):
 
         except Exception as e:
             app.logger.exception(e)
-            data = {'message': 'Case update failed!'}
+            data = {'message': _('Case update failed!')}
             response = Response(json.dumps(data), status=CODES.get('INTERNAL_SERVER_ERROR'),
                                 mimetype=MIME_TYPES.get('APPLICATION_JSON'))
             return response
@@ -145,7 +146,7 @@ class CaseRoutes(MethodResource):
 
             if case_id == 406:
                 data = {
-                        'message': 'Unable to update case status. Either Blocking is disabled or case has already been recovered.',
+                        'message': _('Unable to update case status. Either Blocking is disabled or case has already been recovered.'),
                     }
                 response = Response(json.dumps(data), status=CODES.get("NOT_ACCEPTABLE"),
                                     mimetype=MIME_TYPES.get("APPLICATION_JSON"))
@@ -153,14 +154,14 @@ class CaseRoutes(MethodResource):
 
             if case_id == 409:
                 data = {
-                    'message': 'Case already has the same status.',
+                    'message': _('Case already has the same status.'),
                 }
                 response = Response(json.dumps(data), status=CODES.get("CONFLICT"),
                                     mimetype=MIME_TYPES.get("APPLICATION_JSON"))
                 return response
 
             if case_id:
-                data = {'message': 'Case status updated', 'tracking_id': tracking_id}
+                data = {'message': _('Case status updated'), 'tracking_id': tracking_id}
                 response = Response(json.dumps(data), status=CODES.get("OK"),
                                     mimetype=MIME_TYPES.get("APPLICATION_JSON"))
                 return response
@@ -168,7 +169,7 @@ class CaseRoutes(MethodResource):
                 data = {
 
                     "tracking_id": tracking_id,
-                    "message": "Case not found"
+                    "message": _("Case not found")
 
                 }
 
@@ -178,7 +179,7 @@ class CaseRoutes(MethodResource):
 
         except Exception as e:
             app.logger.exception(e)
-            data = {'message': 'Case status update failed!'}
+            data = {'message': _('Case status update failed!')}
             response = Response(json.dumps(data), status=CODES.get('INTERNAL_SERVER_ERROR'),
                                 mimetype=MIME_TYPES.get('APPLICATION_JSON'))
             return response
@@ -320,7 +321,7 @@ class InsertCase(MethodResource):
 
             if tracking_id.get('code') == 400:
                 data = {
-                    "message": "Enter at least one optional field with full name in personal details."
+                    "message": _("Enter at least one optional field with full name in personal details.")
                 }
 
                 response = Response(json.dumps(data), status=CODES.get("BAD_REQUEST"),
@@ -329,7 +330,7 @@ class InsertCase(MethodResource):
 
             if tracking_id.get('code') == 200:
                 data = {
-                    'message': 'case successfully added',
+                    'message': _('case successfully added'),
                     'tracking_id': tracking_id.get('data')
                 }
 
@@ -338,7 +339,7 @@ class InsertCase(MethodResource):
                 return response
             else:
                 data = {
-                    'message': 'case addition failed',
+                    'message': _('case addition failed'),
                 }
 
                 response = Response(json.dumps(data), status=CODES.get('INTERNAL_SERVER_ERROR'),
@@ -349,7 +350,7 @@ class InsertCase(MethodResource):
             app.logger.exception(e)
 
             data = {
-                'message': 'case addition failed'
+                'message': _('case addition failed')
             }
 
             response = Response(json.dumps(data), status=CODES.get('INTERNAL_SERVER_ERROR'),
@@ -368,14 +369,14 @@ class UpdateCase(MethodResource):
 
             if case_id == 406:
                 data = {
-                    'message': 'Case updation not allowed in this status',
+                    'message': _('Case updation not allowed in this status'),
                 }
                 response = Response(json.dumps(data), status=CODES.get("NOT_ACCEPTABLE"),
                                     mimetype=MIME_TYPES.get("APPLICATION_JSON"))
                 return response
 
             if case_id:
-                data = {'message': 'Case status updated', 'tracking_id': tracking_id}
+                data = {'message': _('Case status updated'), 'tracking_id': tracking_id}
                 response = Response(json.dumps(data), status=CODES.get("OK"),
                                     mimetype=MIME_TYPES.get("APPLICATION_JSON"))
                 return response
@@ -383,7 +384,7 @@ class UpdateCase(MethodResource):
                 data = {
 
                     "tracking_id": tracking_id,
-                    "message": "Case not found"
+                    "message": _("Case not found")
 
                 }
 
@@ -393,7 +394,7 @@ class UpdateCase(MethodResource):
 
         except Exception as e:
             app.logger.exception(e)
-            data = {'message': 'Update of case information failed!'}
+            data = {'message': _('Update of case information failed!')}
             response = Response(json.dumps(data), status=CODES.get('INTERNAL_SERVER_ERROR'),
                                 mimetype=MIME_TYPES.get('APPLICATION_JSON'))
             return response

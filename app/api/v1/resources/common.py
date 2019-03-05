@@ -30,13 +30,14 @@ from flask import Response
 from app import app
 from ..models.status import Status
 from flask_apispec import MethodResource, doc
+from flask_babel import _
 
 
 @app.route('/')
 def index_route():
     """Flask base route"""
     data = {
-        'message': 'Welcome to LSDS'
+        'message': _('Welcome to LSDS')
     }
 
     response = Response(json.dumps(data), status=200, mimetype='application/json')
@@ -53,20 +54,20 @@ class BaseRoutes(MethodResource):
             resp = requests.get('{base}/{version}/version'.format(base=app.config['dev_config']['dirbs_core']['base_url'], version=app.config['dev_config']['dirbs_core']['version']))  # dirbs core imei api call
             if resp.status_code == 200:
                 data = {
-                    "core_status": "CORE connected successfully."
+                    "core_status": _("CORE connected successfully.")
                 }
             else:
                 data = {
-                    "core_status": "CORE connection failed."
+                    "core_status": _("CORE connection failed.")
                 }
         except requests.ConnectionError:
             data = {
-                "core_status": "CORE connection failed."
+                "core_status": _("CORE connection failed.")
             }
         try:
             Status().query.all()
-            data['db_status'] = "Database connected successfully"
+            data['db_status'] = _("Database connected successfully")
         except:
-            data['db_status'] = "Database connection failed"
+            data['db_status'] = _("Database connection failed")
 
         return Response(json.dumps(data), status=200, mimetype='application/json')
