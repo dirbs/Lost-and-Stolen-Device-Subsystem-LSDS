@@ -57,7 +57,7 @@ Postgresql Server). To setup the local environment, follow the section below:
 #### Setting up local dev environment
 For setting up a local dev environment we assume that the ```prerequisites``` are met already. To setup a local 
 environment:
-* Create database using Postgresql (Name and credentials should be same as in [config](tests/testdata/config.ini))
+* Create database using Postgresql (Name and credentials should be same as in [config](tests/testdata/config_test.ini))
 * Create virtual environment using **virtualenv** and activate it:
 ```bash
 pip3 install virtualenv 

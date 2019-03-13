@@ -52,7 +52,7 @@ def app(tmpdir_factory):
 
     # update configuration file path
     config = configparser.ConfigParser()
-    config.read(path.abspath(path.dirname(__file__) + "/testdata/config.ini"))
+    config.read(path.abspath(path.dirname(__file__) + "/testdata/config_test.ini"))
 
     temp_lists = tmpdir_factory.mktemp('uploads')
 

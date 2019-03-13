@@ -20,7 +20,7 @@
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-PyYAML==3.13
+PyYAML==3.12
 sqlalchemy==1.2.8
 flask==1.0.2
 flask-restful==0.3.6
@@ -35,3 +35,4 @@ marshmallow==2.15.4
 flask-apispec==0.7.0
 apispec==0.39.0
 pandas==0.23.0
+flask_babel

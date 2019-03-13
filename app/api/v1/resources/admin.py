@@ -66,12 +66,12 @@ class FetchImei(MethodResource):
                 return response
             else:
                 data = {
-                    _("message"): [_("Failed to retrieve IMEI response from core system.")]
+                    "message": _("Failed to retrieve IMEI response from core system.")
                 }
                 return Response(json.dumps(data), status=CODES.get("SERVICE_UNAVAILABLE"), mimetype=MIME_TYPES.get("APPLICATION_JSON"))
         except ValueError as error:
             data = {
-                "message": [_(str(error))]
+                "message": _(str(error))
             }
 
             response = Response(json.dumps(data), status=CODES.get("BAD_REQUEST"),
@@ -80,7 +80,7 @@ class FetchImei(MethodResource):
         except Exception:
             app.logger.critical("exception encountered during GET api/v1/imei, see logs below")
             data = {
-                    "message": [_("Error generating IMEI response. Check dirbs core url.")]
+                    "message": _("Error generating IMEI response. Check dirbs core url.")
                 }
 
             response = Response(json.dumps(data), status=CODES.get("SERVICE_UNAVAILABLE"),
@@ -140,7 +140,7 @@ class FetchMsisdn(MethodResource):
             return response
         except Exception:
             data = {
-                    "message": [_("Error generating MSISDN response. Check dirbs core url.")]
+                    "message": _("Error generating MSISDN response. Check dirbs core url.")
                 }
             response = Response(json.dumps(data), status=CODES.get("SERVICE_UNAVAILABLE"), mimetype=MIME_TYPES.get("APPLICATION_JSON"))
             return response
