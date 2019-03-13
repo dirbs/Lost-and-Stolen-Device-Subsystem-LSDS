@@ -38,7 +38,7 @@ CORS(app)
 
 try:
     config = configparser.ConfigParser()
-    config.read("config_test.ini")
+    config.read("config.ini")
     app.config['dev_config'] = config
 
     global_config = yaml.safe_load(open("etc/config.yml"))

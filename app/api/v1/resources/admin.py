@@ -71,13 +71,13 @@ class FetchImei(MethodResource):
                 return Response(json.dumps(data), status=CODES.get("SERVICE_UNAVAILABLE"), mimetype=MIME_TYPES.get("APPLICATION_JSON"))
         except ValueError as error:
             data = {
-                "message": _(str(error))
+                "message": str(error)
             }
 
             response = Response(json.dumps(data), status=CODES.get("BAD_REQUEST"),
                                 mimetype=MIME_TYPES.get("APPLICATION_JSON"))
             return response
-        except Exception:
+        except Exception as e:
             app.logger.critical("exception encountered during GET api/v1/imei, see logs below")
             data = {
                     "message": _("Error generating IMEI response. Check dirbs core url.")
