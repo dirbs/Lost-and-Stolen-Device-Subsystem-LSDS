@@ -29,10 +29,9 @@ flask_script==2.0.6
 flask_migrate==2.1.1
 psycopg2-binary==2.7.4
 requests==2.20.0
-webargs==3.0.1
 flask-cors==3.0.4
 marshmallow==2.15.4
 flask-apispec==0.7.0
 apispec==0.39.0
 pandas==0.23.0
-flask_babel
+flask_babel==0.12.2

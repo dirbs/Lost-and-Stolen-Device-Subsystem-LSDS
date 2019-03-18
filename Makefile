@@ -21,7 +21,19 @@
 # Lost Stolen Device Subsystem Makefile
 #
 
-.PHONY: install-db, upgrade-db, start-dev, test, lint
+.PHONY: clean-pyc dist install-db, upgrade-db, start-dev, test, lint
+.EXPORT_ALL_VARIABLES:
+FLASK_ENV = development
+FLASK_DEBUG = True
+
+clean: clean-pyc
+	rm	-rf dist .cache migrations
+
+clean-pyc:
+	find . -name '*.pyc' -exec rm -f {} +
+	find . -name '*.pyo' -exec rm -f {} +
+	find . -name '*~' -exec rm -f {} +
+	find . -name *pyc | grep __pycache__ | xargs rm -rf
 
 start-dev:
 	pip3 install -r requirements.txt

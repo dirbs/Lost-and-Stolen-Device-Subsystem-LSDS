@@ -135,6 +135,7 @@ class SearchResponseSchema(Schema):
     tracking_id = fields.Str(attribute='tracking_id')
     status = fields.Str(attribute='status')
     updated_at = fields.Str(attribute='updated_at')
+    get_blocked = fields.Boolean(attribute='get_blocked')
     incident_details = fields.Dict(attribute='incident_details')
     personal_details = fields.Dict(attribute='personal_details')
     creator = fields.Dict(attribute='creator')

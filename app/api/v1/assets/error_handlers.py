@@ -43,6 +43,14 @@ def not_found_handler(error):
     return response
 
 
+@app.errorhandler(422)
+def validation_errors(error):
+    """Transform marshmallow validation errors to custom responses to maintain backward-compatibility."""
+
+    return Response(json.dumps({"messages": error.exc.messages}), status=422,
+                    mimetype='application/json')
+
+
 # flask-restful custom errors
 CustomErrors = {
     'MethodNotAllowed': {
