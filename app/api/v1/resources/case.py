@@ -207,6 +207,7 @@ class CaseList(MethodResource):
                         'comment_date': comment.get('comment_date').split(' ', 1)[0]
                     })
             case_detail = {
+                    "get_blocked": case.get('get_blocked'),
                     "creator": {
                         "user_id": case.get('user_id'),
                         "username": case.get('username')
