@@ -58,6 +58,7 @@ class CaseUpdateSchema(Schema):
     """Update case schema."""
     status_args = fields.Nested(UserSchema, only=['username', 'user_id', 'case_comment'], required=True)
     personal_details = fields.Nested(PersonalDetailsSchema)
+    case_details = fields.Nested(CaseDetailsSchema)
 
     @property
     def fields_dict(self):

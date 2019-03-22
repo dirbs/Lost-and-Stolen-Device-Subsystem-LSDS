@@ -189,7 +189,7 @@ class Case(db.Model):
                 if case.case_status == 3:
 
                     personal_details = args.get("personal_details")
-                    status_args = args.get('status_args')
+                    # status_args = args.get('status_args')
 
                     if any(item is not None for item in [personal_details.get('email'), personal_details.get('dob'),
                                                          personal_details.get('address'), personal_details.get('gin'),
@@ -197,8 +197,8 @@ class Case(db.Model):
 
                         CasePersonalDetails.update(personal_details, case.id)
 
-                        CaseComments.add(status_args.get('case_comment'), case.id, status_args.get('user_id'),
-                                         status_args.get('username'))
+                        # CaseComments.add(status_args.get('case_comment'), case.id, status_args.get('user_id'),
+                        #                status_args.get('username'))
 
                         Case.update_case(tracking_id)
 
@@ -223,7 +223,6 @@ class Case(db.Model):
             case = cls.query.filter_by(tracking_id=tracking_id).first()
             if case:
                 if case.case_status == 3:
-
                     case_details = args.get("case_details")
                     status_args = args.get('status_args')
 

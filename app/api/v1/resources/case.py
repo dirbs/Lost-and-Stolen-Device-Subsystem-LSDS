@@ -85,6 +85,7 @@ class CaseRoutes(MethodResource):
     def put(self, tracking_id, **kwargs):
         """Update case personal details."""
         try:
+            case_id = Case.update_blocked_info(kwargs, tracking_id)
             case_id = Case.update(kwargs, tracking_id)
 
             if case_id == 406:
