@@ -62,8 +62,8 @@ class DeviceDetails(db.Model):
     def add(cls, args, case_id):
         """Insert details."""
         try:
-            device = cls(case_id, args.get("brand"), args.get("model_name"),
-                         args.get("description"))
+            device = cls(case_id, args.get("brand").strip(), args.get("model_name").strip(),
+                         args.get("description").strip())
 
             db.session.add(device)
             db.session.flush()
