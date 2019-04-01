@@ -40,9 +40,9 @@ class CasePersonalDetails(db.Model):
     def __init__(self, args, case_id):
         """Constructor"""
         self.case_id = case_id
-        self.full_name = args.get("full_name")
+        self.full_name = args.get("full_name").strip()
         self.dob = args.get("dob")
-        self.address = args.get("address")
+        self.address = args.get("address").strip()
         self.gin = args.get("gin")
         self.alternate_number = args.get("number")
         self.email = args.get("email")
@@ -74,9 +74,9 @@ class CasePersonalDetails(db.Model):
         """Update details."""
         try:
             person = cls.query.filter_by(case_id=case_id).first()
-            person.full_name = args.get('full_name')
+            person.full_name = args.get('full_name').strip()
             person.dob = args.get('dob')
-            person.address = args.get('address')
+            person.address = args.get('address').strip()
             person.gin = args.get('gin')
             person.alternate_number = args.get('number')
             person.email = args.get('email')

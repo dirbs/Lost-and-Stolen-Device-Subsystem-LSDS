@@ -46,7 +46,7 @@ class CaseComments(db.Model):
     def add(cls, case_comment, case_id, user_id, username):
         """Insert data"""
         try:
-            comment = cls(case_comment, case_id, user_id, username)
+            comment = cls(case_comment.strip(), case_id, user_id, username.strip())
             db.session.add(comment)
             db.session.commit()
         except Exception:

@@ -6,7 +6,7 @@ from flask_babel import _
 
 def validate_name(val):
     """Validate username format."""
-    match = re.match(r'[a-zA-Z0-9\s][^\x01-\x1F]{0,1000}$', val)
+    match = re.match(r'^(?! )[A-Za-z0-9 ]*[^\x01-\x1F]{0,1000}(?<! )$', val)
     if len(val) < 1:
         raise ValidationError(_("name should contain more than one character"))
     if len(val) > 1000:
@@ -17,7 +17,7 @@ def validate_name(val):
 
 def validate_comment(val):
     """Validate comment format."""
-    match = re.match(r'[a-zA-Z0-9\s][^\x01-\x1F]{0,1000}$', val)
+    match = re.match(r'^(?! )[A-Za-z0-9 ]*[^\x01-\x1F]{0,1000}(?<! )$', val)
     if len(val) < 1:
         raise ValidationError(_("Comment should contain more than one character"))
     if len(val) > 1000:
