@@ -43,10 +43,12 @@ def validate_date(val):
 def validate_imei(val):
     """Validate IMEI format."""
     match = re.match('^[a-fA-F0-9]{14,16}$', val)
-    if len(val) < app.config['system_config']['global'].get('min_imei_length'):
-        raise ValidationError(_("IMEI too short, should contain at least {min} characters").format(min=app.config['system_config']['global'].get('min_imei_length')))
-    if len(val) > app.config['system_config']['global'].get('max_imei_length'):
-        raise ValidationError(_("IMEI too long, cannot contain more than {max} characters").format(max= app.config['system_config']['global'].get('max_imei_length')))
+    min_imei_length = app.config['system_config']['global'].get('min_imei_length')
+    max_imei_length = app.config['system_config']['global'].get('max_imei_length')
+    if len(val) < min_imei_length:
+        raise ValidationError(_("IMEI too short, should contain at least %(min)s characters", min=min_imei_length))
+    if len(val) > max_imei_length:
+        raise ValidationError(_("IMEI too long, cannot contain more than %(max)s characters", max=max_imei_length))
     if match is None:
         raise ValidationError(_("IMEI is invalid."))
 
@@ -61,13 +63,14 @@ def validate_msisdn(val):
 def validate_gin(val):
     """Validate government identification number format."""
     match = re.match(app.config['system_config']['global'].get('gin_regex'), val)
+    gin_length = app.config['system_config']['global'].get('gin_length')
     if match is None:
-        raise ValidationError(_("Government Identification Number must contain {range} digits").format(range=app.config['system_config']['global'].get('gin_length')))
+        raise ValidationError(_("Government Identification Number must contain %(range)s digits", range=gin_length))
 
 
 def validate_others(val, min_range, max_range, field):
     """Validate other fields format."""
     if len(val) < min_range:
-        raise ValidationError(_("{field} should contain at least {min} character").format(field=field, min=min_range))
+        raise ValidationError(_("%(field)s should contain at least %(min)s character", field=field, min=min_range))
     if len(val) > max_range:
-        raise ValidationError(_("{field} cannot contain more than {max} characters").format(field=field, max=max_range))
+        raise ValidationError(_("%(field)s cannot contain more than %(max)s characters", field=field, max=max_range))
