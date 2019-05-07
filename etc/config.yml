@@ -49,5 +49,5 @@ system:
   version: 'v1'
 
 language_support:
-  languages: ['en', 'id', 'ur']
+  languages: ['es', 'id']
   default: 'en'

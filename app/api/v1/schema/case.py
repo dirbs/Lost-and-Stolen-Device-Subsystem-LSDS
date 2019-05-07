@@ -36,8 +36,8 @@ class DeviceDetailsSchema(Schema):
     brand = fields.Str(required=True, validate=lambda p: validate_others(p, 1, 1000, 'brand name'))
     model_name = fields.Str(required=True, validate=lambda p: validate_others(p, 1, 1000, 'model name'))
     description = fields.Str(required=True, validate=lambda p: validate_others(p, 1, 1000, 'description'))
-    imeis = fields.List(fields.Str(required=True, validate=validate_imei))
-    msisdns = fields.List(fields.Str(required=True, validate=validate_msisdn))
+    imeis = fields.List(fields.Str(required=True, validate=validate_imei), validate=block_duplicates, required=True)
+    msisdns = fields.List(fields.Str(required=True, validate=validate_msisdn), validate=block_duplicates, required=True)
 
 
 class CaseInsertSchema(Schema):

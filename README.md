@@ -68,7 +68,7 @@ Make sure the virtual environment is made using python3
 
 * Create /uploads folder in / directory
 
-* Replace sample configuration in config.ini to similar configurations in (tests/testdata/config.ini)
+* Replace sample configuration in config.ini to similar configurations in (tests/testdata/config_test.ini)
 
 * Run Database migrations using:
 
@@ -77,6 +77,11 @@ make install-db
 ```
 
 This will automatically create and migrate database schemas and requirements.
+
+* Compile multi language encoded files
+```bash
+pybabel compile -d app/translations
+```
 
 * Start LSDS development server using:
 

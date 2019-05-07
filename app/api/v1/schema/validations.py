@@ -74,3 +74,14 @@ def validate_others(val, min_range, max_range, field):
         raise ValidationError(_("%(field)s should contain at least %(min)s character", field=field, min=min_range))
     if len(val) > max_range:
         raise ValidationError(_("%(field)s cannot contain more than %(max)s characters", field=field, max=max_range))
+
+
+def block_duplicates(list):
+    """Validate list to prevent duplicates insertion."""
+    seen = set()
+    for x in list:
+        if x not in seen:
+            seen.add(x)
+        else:
+            raise ValidationError(_("System cannot accept duplicate Values"))
+
