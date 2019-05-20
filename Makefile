@@ -58,8 +58,11 @@ lint:
 	-pip install pylint
 	-pylint --verbose app/* scripts/* tests/* manage.py run.py
 
-gen-list:
+gen-delta-list:
 	-python3 manage.py genlist
+
+gen-full-list:
+	-python3 manage.py GenFullList
 
 test:
 	-pip3 install -r test_requirements.txt

@@ -35,3 +35,4 @@ flask-apispec==0.7.0
 apispec==0.39.0
 pandas==0.23.0
 flask_babel==0.12.2
+tqdm==4.32.1

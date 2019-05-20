@@ -24,12 +24,14 @@
 #######################################################################################################################
 
 import os
-
+import time
 from app import db, app
 import pandas as pd
 from collections import OrderedDict
+from datetime import datetime
 
 from app.api.v1.models.delta_list import DeltaList
+from tqdm import *
 
 
 class GenList:
@@ -38,6 +40,7 @@ class GenList:
     @staticmethod
     def get_distinct_imeis():
         try:
+            app.logger.info("Delta list generation has started.")
             response_data = []  # distinct imeis list
             done = set()  # set of distinct IMEIs
             sql = "select case_status, created_at, i.imei from public.case as c, device_details as d, device_imei as i where d.case_id=c.id and d.id=i.device_id"
@@ -47,6 +50,7 @@ class GenList:
                 if data['imei'] not in done:  # save distinct imeis
                     done.add(data['imei'])  # note it down for further iterations
                     response_data.append(data)  # append distinct imei
+            app.logger.info("Distinct IMEI list from Database generated successfully")
             return response_data
         except Exception as e:
             app.logger.critical("Exception occurred while getting distinct imeis in list generation process")
@@ -59,7 +63,8 @@ class GenList:
         try:
             resp = GenList.get_distinct_imeis()
             delta_list = []  # delta list
-            for data in resp:  # iterate distince imeis
+            for data in tqdm(resp):  # iterate distince imeis
+                time.sleep(0.1)
                 sql = "select imei, status from delta_list where imei='"+data.get('imei')+"'"
                 query = db.engine.execute(sql)  # check if imei already exists in delta list model
                 result = list(query)
@@ -86,7 +91,8 @@ class GenList:
 
                         delta_list.append(record)  # append record to delta list
                         DeltaList.insert(data.get('imei'), data.get('case_status'))  # insert new entry in delta list model
-            return GenList.upload_list(delta_list)
+            app.logger.info("Delta list prepared successfully")
+            return GenList.upload_list(delta_list, 'StolenDeltaList')
         except Exception as e:
             app.logger.critical("exception encountered during delta list generation, see blow logs")
             app.logger.exception(e)
@@ -95,15 +101,43 @@ class GenList:
             db.session.close()
 
     @staticmethod
-    def upload_list(list):
+    def upload_list(list, name):
         try:
             stolen_delta_list = pd.DataFrame(list)
-            report_name = 'stolen_delta_list.csv'
-            if not stolen_delta_list.empty:
-                stolen_delta_list.to_csv(os.path.join(app.config['dev_config']['UPLOADS']['list_dir'], report_name), sep=',', index=False)  # writing stolen list to .csv file
-                return "List has been saved successfully."
-            return "Delta list not generated due to no new records found you can see previous version of list."
+            time = datetime.now().strftime("%m-%d-%YT%H:%M:%S")
+            report_name = name+time+'.csv'
+            stolen_delta_list.to_csv(os.path.join(app.config['dev_config']['UPLOADS']['list_dir'], report_name), sep=',', index=False)  # writing stolen list to .csv file
+            app.logger.info("Delta list saved successfully")
+            return "List has been saved successfully."
         except Exception as e:
             app.logger.critical("Exception occurred while uploading delta list")
             app.logger.exception(e)
             return "Exception occurred while uploading list."
+
+    @staticmethod
+    def get_full_list():
+        try:
+            app.logger.info("Full List generation has started.")
+            response_data = []  # distinct imeis list
+            sql = "select case_status, created_at, i.imei from public.case as c, device_details as d, device_imei as i where d.case_id=c.id and d.id=i.device_id"
+            query = db.engine.execute(sql)  # retrieve imeis from case, device and imei models
+            results = list(query)
+            with tqdm(total=len(results)) as pbar:
+                for row in reversed(results):  # iterate results
+                    tqdm.update(pbar)
+                    time.sleep(0.2)
+                    data = dict((col, val) for col, val in row.items())  # serialize in key, value pairs
+                    record = OrderedDict()
+                    record['imei'] = data.get('imei')
+                    record["reporting_date"] = data.get('created_at').strftime("%Y%m%dT%H:%M:%S")
+                    # add current status of imei
+                    record["status"] = "pending" if data.get('case_status') == 3 else "recovered" if data.get(
+                        'case_status') == 1 else "blacklist"
+                    response_data.append(record)  # append distinct imei
+            app.logger.info("Full list prepared successfully")
+            return GenList.upload_list(response_data, 'StolenFullList')
+        except Exception as e:
+            app.logger.critical("Exception occurred while getting distinct imeis in list generation process")
+            app.logger.exception(e)
+            return "Exception occurred while getting distinct imeis."
+

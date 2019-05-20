@@ -121,7 +121,13 @@ make upgrade-db
 * To generate delta stolen list for DIRBS Core:
 
 ```bash
-make gen-list
+make gen-delta-list
+```
+
+* To generate stolen full list for DIRBS Core:
+
+```bash
+make gen-full-list
 ```
 
 * To run unit tests:

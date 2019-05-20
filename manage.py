@@ -101,5 +101,9 @@ def genlist():
     return GenList.create_list()
 
 
+@manager.command
+def GenFullList():
+    return GenList.get_full_list()
+
 if __name__ == '__main__':
     manager.run()
