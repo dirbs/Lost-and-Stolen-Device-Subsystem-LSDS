@@ -198,3 +198,26 @@ msgstr "%(field)s debe contener al menos %(min)s carácter"
 msgid "%(field)s cannot contain more than %(max)s characters"
 msgstr "%(field)s no puede contener más de %(max)s caracteres"
 
+msgid "PENDING"
+msgstr "PENDIENTE"
+
+msgid "RECOVERED"
+msgstr "RECUPERADO"
+
+msgid "BLOCKED"
+msgstr "OBSTRUIDO"
+
+msgid "LOST"
+msgstr "PERDIÓ"
+
+msgid "STOLEN"
+msgstr "ROBADO"
+
+msgid "System cannot accept duplicate Values"
+msgstr "El sistema no puede aceptar valores duplicados"
+
+msgid "Value is invalid. Does not match the selected language or invalid format."
+msgstr "El valor no es válido. No coincide con el idioma seleccionado o el formato no válido."
+
+
+

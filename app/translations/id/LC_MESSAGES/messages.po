@@ -198,3 +198,26 @@ msgstr "%(field)s harus mengandung setidaknya %(min)s karakter"
 msgid "%(field)s cannot contain more than %(max)s characters"
 msgstr "%(field)s tidak boleh mengandung lebih dari %(max)s karakter"
 
+msgid "PENDING"
+msgstr "TERTUNDA"
+
+msgid "RECOVERED"
+msgstr "PULIH"
+
+msgid "BLOCKED"
+msgstr "DIBLOKIR"
+
+msgid "LOST"
+msgstr "KALAH"
+
+msgid "STOLEN"
+msgstr "DICURI"
+
+msgid "System cannot accept duplicate Values"
+msgstr "Sistem tidak dapat menerima Nilai duplikat"
+
+msgid "Value is invalid. Does not match the selected language or invalid format."
+msgstr "Nilai tidak valid. Tidak cocok dengan bahasa yang dipilih atau format yang tidak valid."
+
+
+

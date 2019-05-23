@@ -47,6 +47,7 @@ class CaseInsertSchema(Schema):
     incident_details = fields.Nested(IncidentDetailsSchema)
     personal_details = fields.Nested(PersonalDetailsSchema)
     device_details = fields.Nested(DeviceDetailsSchema)
+    Accept_Language = fields.Str(description="Selected language", location='headers', attribute='Accept-Language')
 
     @property
     def fields_dict(self):
