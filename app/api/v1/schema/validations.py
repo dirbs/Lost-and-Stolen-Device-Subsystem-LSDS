@@ -4,12 +4,26 @@ from app import app
 from flask_babel import _
 
 
-def validate_name(val):
+def validate_username(val):
     """Validate username format."""
     if len(val) < 1:
-        raise ValidationError(_("name should contain more than one character"))
+        raise ValidationError(_("Username should contain more than one character"))
     if len(val) > 1000:
-        raise ValidationError(_("name cannot contain more than 1000 characters"))
+        raise ValidationError(_("Username cannot contain more than 1000 characters"))
+    match = re.match(app.config['system_config']['regex'][app.config['system_config']['language_support']['default']]['username'],val)
+    if match is None:
+        raise ValidationError(_("Username is invalid. Does not match the selected language or invalid format."))
+
+
+def validate_fullname(val):
+    """Validate username format."""
+    if len(val) < 1:
+        raise ValidationError(_("Fullname should contain more than one character"))
+    if len(val) > 1000:
+        raise ValidationError(_("Fullname cannot contain more than 1000 characters"))
+    match = re.match(app.config['system_config']['regex'][app.config['system_config']['language_support']['default']]['full_name'],val)
+    if match is None:
+        raise ValidationError(_("Fullname is invalid. Does not match the selected language or invalid format."))
 
 
 def validate_comment(val):
@@ -18,6 +32,20 @@ def validate_comment(val):
         raise ValidationError(_("Comment should contain more than one character"))
     if len(val) > 1000:
         raise ValidationError(_("Comment cannot contain more than 1000 characters"))
+    match = re.match(app.config['system_config']['regex'][app.config['system_config']['language_support']['default']['case_comment']],val)
+    if match is None:
+        raise ValidationError(_("Comment is invalid. Does not match the selected language or invalid format."))
+
+
+def validate_description(val):
+    """Validate comment format."""
+    if len(val) < 1:
+        raise ValidationError(_("Description should contain more than one character"))
+    if len(val) > 1000:
+        raise ValidationError(_("Description cannot contain more than 1000 characters"))
+    match = re.match(app.config['system_config']['regex'][app.config['system_config']['language_support']['default']]['description'],val)
+    if match is None:
+        raise ValidationError(_("Description is invalid. Does not match the selected language or invalid format."))
 
 
 def validate_number(val):
@@ -62,12 +90,37 @@ def validate_gin(val):
         raise ValidationError(_("Government Identification Number must contain %(range)s digits", range=gin_length))
 
 
-def validate_others(val, min_range, max_range, field):
+def validate_address(val):
     """Validate other fields format."""
-    if len(val) < min_range:
-        raise ValidationError(_("%(field)s should contain at least %(min)s character", field=field, min=min_range))
-    if len(val) > max_range:
-        raise ValidationError(_("%(field)s cannot contain more than %(max)s characters", field=field, max=max_range))
+    if len(val) < 1:
+        raise ValidationError(_("Address should contain at least 1 character"))
+    if len(val) > 1000:
+        raise ValidationError(_("Address cannot contain more than 1000 characters"))
+    match = re.match(app.config['system_config']['regex'][app.config['system_config']['language_support']['default']]['address'],val)
+    if match is None:
+        raise ValidationError(_("Address is invalid. Does not match the selected language or invalid format."))
+
+
+def validate_brand(val):
+    """Validate other fields format."""
+    if len(val) < 1:
+        raise ValidationError(_("Brand should contain at least 1 character"))
+    if len(val) > 1000:
+        raise ValidationError(_("Brand cannot contain more than 1000 characters"))
+    match = re.match(app.config['system_config']['regex'][app.config['system_config']['language_support']['default']]['brand'],val)
+    if match is None:
+        raise ValidationError(_("Brand is invalid. Does not match the selected language or invalid format."))
+
+
+def validate_model_name(val):
+    """Validate other fields format."""
+    if len(val) < 1:
+        raise ValidationError(_("Model name should contain at least 1 character"))
+    if len(val) > 1000:
+        raise ValidationError(_("Model name cannot contain more than 1000 characters"))
+    match = re.match(app.config['system_config']['regex'][app.config['system_config']['language_support']['default']]['model_name'],val)
+    if match is None:
+        raise ValidationError(_("Model name is invalid. Does not match the selected language or invalid format."))
 
 
 def block_duplicates(list):
@@ -78,20 +131,3 @@ def block_duplicates(list):
             seen.add(x)
         else:
             raise ValidationError(_("System cannot accept duplicate Values"))
-
-
-def validate_lang_based_variables(args):
-    keys_to_avoid = ['case_details', 'Accept-Language', 'incident_details']
-    errors = {"messages": {}}
-    for record_type in args:
-        if record_type not in keys_to_avoid:
-            for values in args[record_type]:
-                if values in app.config['system_config']['regex'][args.get('Accept-Language', 'en')].keys():
-                    match = re.match(app.config['system_config']['regex'][args.get('Accept-Language', 'en')][values], args[record_type][values])
-                    if match is not None:
-                        if record_type not in errors['messages']:
-                            errors['messages'][record_type] = {}
-                            errors['messages'][record_type][values] = [_('Value is invalid. Does not match the selected language or invalid format.')]
-                        errors['messages'][record_type][values] = [_('Value is invalid. Does not match the selected language or invalid format.')]
-    if len(errors['messages'])>0:
-        raise ValidationError(errors)

@@ -10,16 +10,16 @@ class CaseDetailsSchema(Schema):
 class UserSchema(Schema):
     """User schema."""
     user_id = fields.Str(required=True)
-    username = fields.Str(required=True, validate=validate_name)
+    username = fields.Str(required=True, validate=validate_username)
     case_comment = fields.Str(required=True, validate=validate_comment)
     case_status = fields.Int(required=True, validate=lambda p: p == 1 or p == 2 or p == 3)
 
 
 class PersonalDetailsSchema(Schema):
     """Personal details schema."""
-    full_name = fields.Str(required=True, validate=validate_name)
+    full_name = fields.Str(required=True, validate=validate_fullname)
     gin = fields.Str(validate=validate_gin)
-    address = fields.Str(validate=lambda p: validate_others(p, 1, 1000, 'address'))
+    address = fields.Str(validate=validate_address)
     email = fields.Email()
     dob = fields.Str(validate=validate_date)
     number = fields.Str(validate=validate_number)
@@ -33,9 +33,9 @@ class IncidentDetailsSchema(Schema):
 
 class DeviceDetailsSchema(Schema):
     """Device details schema."""
-    brand = fields.Str(required=True, validate=lambda p: validate_others(p, 1, 1000, 'brand name'))
-    model_name = fields.Str(required=True, validate=lambda p: validate_others(p, 1, 1000, 'model name'))
-    description = fields.Str(required=True, validate=lambda p: validate_others(p, 1, 1000, 'description'))
+    brand = fields.Str(required=True, validate=validate_brand)
+    model_name = fields.Str(required=True, validate=validate_model_name)
+    description = fields.Str(required=True, validate=validate_description)
     imeis = fields.List(fields.Str(required=True, validate=validate_imei), validate=block_duplicates, required=True)
     msisdns = fields.List(fields.Str(required=True, validate=validate_msisdn), validate=block_duplicates, required=True)
 
@@ -47,7 +47,6 @@ class CaseInsertSchema(Schema):
     incident_details = fields.Nested(IncidentDetailsSchema)
     personal_details = fields.Nested(PersonalDetailsSchema)
     device_details = fields.Nested(DeviceDetailsSchema)
-    Accept_Language = fields.Str(description="Selected language", location='headers', attribute='Accept-Language')
 
     @property
     def fields_dict(self):

@@ -34,7 +34,6 @@ from ..schema.validations import *
 from flask import Response
 from sqlalchemy import desc
 from flask_apispec import use_kwargs, MethodResource, doc
-from marshmallow import ValidationError
 
 
 class CaseRoutes(MethodResource):
@@ -86,11 +85,6 @@ class CaseRoutes(MethodResource):
     @use_kwargs(CaseUpdateSchema().fields_dict, locations=['json', 'headers'])
     def put(self, tracking_id, **kwargs):
         """Update case personal details."""
-        try:
-            validate_lang_based_variables(kwargs)
-        except ValidationError as err:
-            return Response(json.dumps(err.messages), status=CODES.get('UNPROCESSABLE_ENTITY'), mimetype=MIME_TYPES.get('APPLICATION_JSON'))
-
         try:
             case_id = Case.update_blocked_info(kwargs, tracking_id)
             case_id = Case.update(kwargs, tracking_id)
@@ -149,11 +143,6 @@ class CaseRoutes(MethodResource):
         """Update case status."""
 
         args = kwargs.get('status_args')
-        try:
-            validate_lang_based_variables(kwargs)
-        except ValidationError as err:
-            return Response(json.dumps(err.messages), status=CODES.get('UNPROCESSABLE_ENTITY'), mimetype=MIME_TYPES.get('APPLICATION_JSON'))
-
         try:
             case_id = Case.update_status(args, tracking_id)
 
@@ -323,11 +312,6 @@ class InsertCase(MethodResource):
     def post(self, **kwargs):
         """Insert case details."""
         try:
-            validate_lang_based_variables(kwargs)
-        except ValidationError as err:
-            return Response(json.dumps(err.messages), status=CODES.get('UNPROCESSABLE_ENTITY'), mimetype=MIME_TYPES.get('APPLICATION_JSON'))
-
-        try:
             tracking_id = Case.create(kwargs)
 
             if tracking_id.get('code') == 409:
@@ -382,11 +366,6 @@ class UpdateCase(MethodResource):
     @use_kwargs(CaseGetBlockedSchema().fields_dict, locations=['json'])
     def patch(self, tracking_id, **args):
         """Update case get blocked information."""
-        try:
-            validate_lang_based_variables(args)
-        except ValidationError as err:
-            return Response(json.dumps(err.messages), status=CODES.get('UNPROCESSABLE_ENTITY'), mimetype=MIME_TYPES.get('APPLICATION_JSON'))
-
         try:
             case_id = Case.update_blocked_info(args, tracking_id)
 
