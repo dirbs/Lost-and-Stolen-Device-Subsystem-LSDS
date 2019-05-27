@@ -108,7 +108,7 @@ class GenList:
             report_name = name+time+'.csv'
             stolen_delta_list.to_csv(os.path.join(app.config['dev_config']['UPLOADS']['list_dir'], report_name), sep=',', index=False)  # writing stolen list to .csv file
             app.logger.info("Delta list saved successfully")
-            return "List has been saved successfully."
+            return "List has been saved successfully - "+report_name+"."
         except Exception as e:
             app.logger.critical("Exception occurred while uploading delta list")
             app.logger.exception(e)
@@ -127,13 +127,14 @@ class GenList:
                     tqdm.update(pbar)
                     time.sleep(0.2)
                     data = dict((col, val) for col, val in row.items())  # serialize in key, value pairs
-                    record = OrderedDict()
-                    record['imei'] = data.get('imei')
-                    record["reporting_date"] = data.get('created_at').strftime("%Y%m%dT%H:%M:%S")
-                    # add current status of imei
-                    record["status"] = "pending" if data.get('case_status') == 3 else "recovered" if data.get(
-                        'case_status') == 1 else "blacklist"
-                    response_data.append(record)  # append distinct imei
+                    if data['case_status']!=1:
+                        record = OrderedDict()
+                        record['imei'] = data.get('imei')
+                        record["reporting_date"] = data.get('created_at').strftime("%Y%m%dT%H:%M:%S")
+                        # add current status of imei
+                        record["status"] = "pending" if data.get('case_status') == 3 else "recovered" if data.get(
+                            'case_status') == 1 else "blacklist"
+                        response_data.append(record)  # append distinct imei
             app.logger.info("Full list prepared successfully")
             return GenList.upload_list(response_data, 'StolenFullList')
         except Exception as e:
