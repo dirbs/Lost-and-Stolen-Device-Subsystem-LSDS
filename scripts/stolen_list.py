@@ -62,6 +62,7 @@ class GenList:
         """Generates delta stolen list."""
         try:
             resp = GenList.get_distinct_imeis()
+            app.logger.info("Comparing IMEIs with previous delta...")
             delta_list = []  # delta list
             for data in tqdm(resp):  # iterate distince imeis
                 time.sleep(0.1)
@@ -91,8 +92,11 @@ class GenList:
 
                         delta_list.append(record)  # append record to delta list
                         DeltaList.insert(data.get('imei'), data.get('case_status'))  # insert new entry in delta list model
-            app.logger.info("Delta list prepared successfully")
-            return GenList.upload_list(delta_list, 'StolenDeltaList')
+            if len(delta_list)>0:
+                app.logger.info("Delta list prepared successfully")
+                return GenList.upload_list(delta_list, 'StolenDeltaList')
+            else:
+                return "No IMEIs to export. Exiting!!"
         except Exception as e:
             app.logger.critical("exception encountered during delta list generation, see blow logs")
             app.logger.exception(e)
@@ -104,11 +108,11 @@ class GenList:
     def upload_list(list, name):
         try:
             stolen_delta_list = pd.DataFrame(list)
-            time = datetime.now().strftime("%m-%d-%YT%H:%M:%S")
+            time = datetime.now().strftime("%m-%d-%YT%H%M%S")
             report_name = name+time+'.csv'
             stolen_delta_list.to_csv(os.path.join(app.config['dev_config']['UPLOADS']['list_dir'], report_name), sep=',', index=False)  # writing stolen list to .csv file
             app.logger.info("Delta list saved successfully")
-            return "List has been saved successfully - "+report_name+"."
+            return "List "+report_name+" has been saved successfully."
         except Exception as e:
             app.logger.critical("Exception occurred while uploading delta list")
             app.logger.exception(e)
@@ -130,7 +134,7 @@ class GenList:
                     if data['case_status']!=1:
                         record = OrderedDict()
                         record['imei'] = data.get('imei')
-                        record["reporting_date"] = data.get('created_at').strftime("%Y%m%dT%H:%M:%S")
+                        record["reporting_date"] = data.get('created_at').strftime("%Y%m%d")
                         # add current status of imei
                         record["status"] = "pending" if data.get('case_status') == 3 else "recovered" if data.get(
                             'case_status') == 1 else "blacklist"

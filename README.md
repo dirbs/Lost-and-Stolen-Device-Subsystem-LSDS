@@ -66,7 +66,7 @@ source venv/bin/activate
 ```
 Make sure the virtual environment is made using python3
 
-* Create /uploads folder in / directory
+* Create /lists folder in / directory
 
 * Replace sample configuration in config.ini to similar configurations in (tests/testdata/config_test.ini)
 
