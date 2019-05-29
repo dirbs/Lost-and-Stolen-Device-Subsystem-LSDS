@@ -32,7 +32,7 @@ def validate_comment(val):
         raise ValidationError(_("Comment should contain more than one character"))
     if len(val) > 1000:
         raise ValidationError(_("Comment cannot contain more than 1000 characters"))
-    match = re.match(app.config['system_config']['regex'][app.config['system_config']['language_support']['default']['case_comment']],val)
+    match = re.match(app.config['system_config']['regex'][app.config['system_config']['language_support']['default']]['case_comment'],val)
     if match is None:
         raise ValidationError(_("Comment is invalid. Does not match the selected language or invalid format."))
 
