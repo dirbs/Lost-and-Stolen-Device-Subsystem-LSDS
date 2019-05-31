@@ -295,7 +295,7 @@ class CaseList(MethodResource):
                 return response
         except Exception as e:
             app.logger.exception(e)
-            data = {'message': "Database connectivity error. Please check connection parameters."}
+            data = {'message': _("Database connectivity error. Please check connection parameters.")}
             response = Response(json.dumps(data), status=CODES.get("INTERNAL_SERVER_ERROR"),
                                 mimetype=MIME_TYPES.get('APPLICATION_JSON'))
 
@@ -316,7 +316,7 @@ class InsertCase(MethodResource):
 
             if tracking_id.get('code') == 409:
                 data = {
-                    'message': 'IMEI: ' + tracking_id.get('data') + ' is a duplicate entry.',
+                    'message': _('IMEI: %(imei)s is a duplicate entry.',imei=tracking_id.get('data')),
                 }
                 response = Response(json.dumps(data), status=CODES.get("CONFLICT"),
                                     mimetype=MIME_TYPES.get("APPLICATION_JSON"))

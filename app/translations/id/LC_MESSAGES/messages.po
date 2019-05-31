@@ -219,5 +219,6 @@ msgstr "Sistem tidak dapat menerima Nilai duplikat"
 msgid "Value is invalid. Does not match the selected language or invalid format."
 msgstr "Nilai tidak valid. Tidak cocok dengan bahasa yang dipilih atau format yang tidak valid."
 
-
+msgid "IMEI: %(imei)s is a duplicate entry."
+msgstr "IMEI: %(imei)s adalah entri dupliacte."
 
