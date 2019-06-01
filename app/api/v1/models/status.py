@@ -24,6 +24,7 @@
 #######################################################################################################################
 
 from app import db
+from flask_babel import _
 # noinspection PyUnresolvedReferences
 from ..models.case import Case
 
@@ -37,4 +38,4 @@ class Status(db.Model):
     @property
     def serialize(self):
         """Serialize data."""
-        return self.description
+        return _(self.description)

@@ -213,6 +213,21 @@ msgstr "PERDIÓ"
 msgid "STOLEN"
 msgstr "ROBADO"
 
+msgid "Pending"
+msgstr "Pendiente"
+
+msgid "Recovered"
+msgstr "Recuperado"
+
+msgid "Blocked"
+msgstr "Obstruido"
+
+msgid "Lost"
+msgstr "PERDIÓ"
+
+msgid "Stolen"
+msgstr "ROBADO"
+
 msgid "System cannot accept duplicate Values"
 msgstr "El sistema no puede aceptar valores duplicados"
 
@@ -222,5 +237,67 @@ msgstr "El valor no es válido. No coincide con el idioma seleccionado o el form
 msgid "IMEI: %(imei)s is a duplicate entry."
 msgstr "IMEI: %(imei)s es una entrada dupliacte."
 
+msgid "Username cannot contain more than 1000 characters"
+msgstr "Nombre de usuario no puede contener más de 1000 caracteres"
+
+msgid "Username should contain more than one character"
+msgstr "Nombre de usuario debe contener más de un carácter"
+
+msgid "Username is invalid. Does not match the selected language or invalid format."
+msgstr "Nombre de usuario invalido. No coincide con el idioma seleccionado o formato no válido."
+
+msgid "Fullname should contain more than one character"
+msgstr "Nombre completo debe contener más de un carácter"
+
+msgid "Fullname cannot contain more than 1000 characters"
+msgstr "Nombre completo no puede contener más de 1000 caracteres"
+
+msgid "Fullname is invalid. Does not match the selected language or invalid format."
+msgstr "Nombre completo es válido. No coincide con el idioma seleccionado o formato no válido."
+
+msgid "Comment should contain more than one character"
+msgstr "Comentario debe contener más de un carácter"
+
+msgid "Comment cannot contain more than 1000 characters"
+msgstr "El comentario no puede contener más de 1000 caracteres"
+
+msgid "Comment is invalid. Does not match the selected language or invalid format."
+msgstr "Comentario es válido. No coincide con el idioma seleccionado o formato no válido."
+
+msgid "Description should contain more than one character"
+msgstr "Descripción debe contener más de un carácter"
+
+msgid "Description cannot contain more than 1000 characters"
+msgstr "La descripción no puede contener más de 1000 caracteres"
+
+msgid "Description is invalid. Does not match the selected language or invalid format."
+msgstr "La descripción es válida. No coincide con el idioma seleccionado o formato no válido."
+
+msgid "Address should contain at least 1 character"
+msgstr "Dirección debe contener al menos 1 carácter"
+
+msgid "Address cannot contain more than 1000 characters"
+msgstr "Dirección no puede contener más de 1000 caracteres"
+
+msgid "Address is invalid. Does not match the selected language or invalid format."
+msgstr "Dirección no es válida. No coincide con el idioma seleccionado o formato no válido."
+
+msgid "Brand should contain at least 1 character"
+msgstr "Marca debe contener al menos 1 carácter"
+
+msgid "Brand cannot contain more than 1000 characters"
+msgstr "Marca no puede contener más de 1000 caracteres"
+
+msgid "Brand is invalid. Does not match the selected language or invalid format."
+msgstr "La marca es válido. No coincide con el idioma seleccionado o formato no válido."
+
+msgid "Model name should contain at least 1 character"
+msgstr "Nombre del modelo debe contener al menos 1 carácter"
+
+msgid "Model name cannot contain more than 1000 characters"
+msgstr "Nombre del modelo no puede contener más de 1000 caracteres"
+
+msgid "Model name is invalid. Does not match the selected language or invalid format."
+msgstr "Nombre del modelo no es válido. No coincide con el idioma seleccionado o formato no válido."
 
 

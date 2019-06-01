@@ -24,6 +24,7 @@
 #######################################################################################################################
 
 from app import db
+from flask_babel import _
 # noinspection PyUnresolvedReferences
 from ..models.caseincidentdetails import CaseIncidentDetails
 
@@ -38,4 +39,4 @@ class NatureOfIncident(db.Model):
     @property
     def serialize(self):
         """Serialize."""
-        return self.name
+        return _(self.name)

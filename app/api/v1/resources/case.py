@@ -226,7 +226,7 @@ class CaseList(MethodResource):
                     "comments": comment_list,
                     "incident_details": {
                         "incident_date": case.get('date_of_incident'),
-                        "incident_nature": case.get('incident_type')
+                        "incident_nature": _(case.get('incident_type'))
                     },
                     "created_at": case.get('created_at').strftime("%Y-%m-%d %H:%M:%S"),
                     "device_details": {
@@ -236,7 +236,7 @@ class CaseList(MethodResource):
                         "msisdns": case.get('msisdns').split(','),
                         "brand": case.get('brand')
                     },
-                    "status": case.get('status'),
+                    "status": _(case.get('status')),
                     "updated_at": case.get('updated_at').strftime("%Y-%m-%d %H:%M:%S")
                 }
 

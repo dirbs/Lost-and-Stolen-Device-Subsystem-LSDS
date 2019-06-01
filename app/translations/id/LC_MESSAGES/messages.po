@@ -213,6 +213,21 @@ msgstr "KALAH"
 msgid "STOLEN"
 msgstr "DICURI"
 
+msgid "Pending"
+msgstr "Tertunda"
+
+msgid "Recovered"
+msgstr "Pulih"
+
+msgid "Blocked"
+msgstr "Diblokir"
+
+msgid "Lost"
+msgstr "Kalah"
+
+msgid "Stolen"
+msgstr "Dicuri"
+
 msgid "System cannot accept duplicate Values"
 msgstr "Sistem tidak dapat menerima Nilai duplikat"
 
@@ -222,3 +237,65 @@ msgstr "Nilai tidak valid. Tidak cocok dengan bahasa yang dipilih atau format ya
 msgid "IMEI: %(imei)s is a duplicate entry."
 msgstr "IMEI: %(imei)s adalah entri dupliacte."
 
+msgid "Username cannot contain more than 1000 characters"
+msgstr "Nama pengguna tidak dapat berisi lebih dari 1000 karakter"
+
+msgid "Username should contain more than one character"
+msgstr "Nama pengguna harus berisi lebih dari satu karakter"
+
+msgid "Username is invalid. Does not match the selected language or invalid format."
+msgstr "Nama pengguna tidak sah. Tidak sesuai dengan bahasa yang dipilih atau format tidak valid."
+
+msgid "Fullname should contain more than one character"
+msgstr "Nama lengkap harus berisi lebih dari satu karakter"
+
+msgid "Fullname cannot contain more than 1000 characters"
+msgstr "Nama lengkap tidak dapat berisi lebih dari 1000 karakter"
+
+msgid "Fullname is invalid. Does not match the selected language or invalid format."
+msgstr "Fullname tidak valid. Tidak sesuai dengan bahasa yang dipilih atau format tidak valid."
+
+msgid "Comment should contain more than one character"
+msgstr "Komentar harus berisi lebih dari satu karakter"
+
+msgid "Comment cannot contain more than 1000 characters"
+msgstr "Komentar tidak dapat berisi lebih dari 1000 karakter"
+
+msgid "Comment is invalid. Does not match the selected language or invalid format."
+msgstr "Komentar tidak valid. Tidak sesuai dengan bahasa yang dipilih atau format tidak valid."
+
+msgid "Description should contain more than one character"
+msgstr "Deskripsi harus berisi lebih dari satu karakter"
+
+msgid "Description cannot contain more than 1000 characters"
+msgstr "Deskripsi tidak dapat berisi lebih dari 1000 karakter"
+
+msgid "Description is invalid. Does not match the selected language or invalid format."
+msgstr "Deskripsi tidak valid. Tidak sesuai dengan bahasa yang dipilih atau format tidak valid."
+
+msgid "Address should contain at least 1 character"
+msgstr "Alamat harus berisi minimal 1 karakter"
+
+msgid "Address cannot contain more than 1000 characters"
+msgstr "Alamat tidak dapat berisi lebih dari 1000 karakter"
+
+msgid "Address is invalid. Does not match the selected language or invalid format."
+msgstr "Alamat tidak valid. Tidak sesuai dengan bahasa yang dipilih atau format tidak valid."
+
+msgid "Brand should contain at least 1 character"
+msgstr "Merek harus berisi minimal 1 karakter"
+
+msgid "Brand cannot contain more than 1000 characters"
+msgstr "Merek tidak dapat berisi lebih dari 1000 karakter"
+
+msgid "Brand is invalid. Does not match the selected language or invalid format."
+msgstr "Merek tidak valid. Tidak sesuai dengan bahasa yang dipilih atau format tidak valid."
+
+msgid "Model name should contain at least 1 character"
+msgstr "Nama model harus berisi minimal 1 karakter"
+
+msgid "Model name cannot contain more than 1000 characters"
+msgstr "Nama model tidak dapat berisi lebih dari 1000 karakter"
+
+msgid "Model name is invalid. Does not match the selected language or invalid format."
+msgstr "nama model tidak valid. Tidak sesuai dengan bahasa yang dipilih atau format tidak valid."

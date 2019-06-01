@@ -1,5 +1,6 @@
 from marshmallow import fields, Schema, pre_dump
 from .validations import *
+from flask_babel import _
 
 
 class CaseDetailsSchema(Schema):
@@ -144,10 +145,11 @@ class SearchResponseSchema(Schema):
 
     @pre_dump
     def serialize_data(self, data):
+        data['status'] = _(data.get('status'))
         data['updated_at'] = data['updated_at'].strftime("%Y-%m-%data %H:%M:%S")
         data['incident_details'] = {
             "incident_date": data.get('date_of_incident'),
-            "incident_nature": data.get('incident')
+            "incident_nature": _(data.get('incident'))
         }
         data['personal_details'] = {
             "full_name": data.get('full_name'),
