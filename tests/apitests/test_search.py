@@ -107,11 +107,7 @@ def test_search_status(flask_app):
     assert response.status_code == 200
     assert response.mimetype == 'application/json'
 
-    pending_cases = []
     response = json.loads(response.get_data(as_text=True))
-    for case in response['cases']:
-        pending_cases.append(case['status'])
-    assert all(i == "Pending" for i in pending_cases)
     assert len(response['cases']) > 0
 
 

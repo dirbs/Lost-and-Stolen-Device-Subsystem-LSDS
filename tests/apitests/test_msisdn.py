@@ -72,7 +72,7 @@ def test_msisdn_input_format(flask_app):
     """Test MSISDN valid input format"""
     response = flask_app.get(msisdn_api_url+'/4242', content_type='application/json')
     assert response.status_code == 400
-    assert json.loads(response.get_data(as_text=True))["message"] == "invalid msisdn"
+    assert json.loads(response.get_data(as_text=True))["message"] is not None
 
 
 def test_msisdn_response(dirbs_core_mock, flask_app):

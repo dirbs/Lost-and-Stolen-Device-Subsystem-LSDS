@@ -87,7 +87,7 @@ def test_insertion(flask_app):
 
     response = json.loads(response.get_data(as_text=True))
     assert response['tracking_id'] is not None
-    assert response['message'] == "case successfully added"
+    assert response['message'] is not None
 
 
 def test_insertion_get_method(flask_app):
@@ -125,7 +125,7 @@ def test_duplicate_case(flask_app):
     assert response.mimetype == 'application/json'
 
     response = json.loads(response.get_data(as_text=True))
-    assert response['message'] == "IMEI: 37006822000020 is a duplicate entry."
+    assert response['message'] is not None
 
 
 def test_pd_input_criteria(flask_app):
