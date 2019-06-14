@@ -167,13 +167,13 @@ msgstr "Format tanggal tidak valid"
 
 #: app/api/v1/schema/validations.py:49
 #, python-format
-msgid "IMEI too short, should contain at least %(min)s characters"
-msgstr "IMEI terlalu pendek, harus mengandung setidaknya %(min)s karakter"
+msgid "IMEI too short, should contain at least %(min)d characters"
+msgstr "IMEI terlalu pendek, harus mengandung setidaknya %(min)d karakter"
 
 #: app/api/v1/schema/validations.py:51
 #, python-format
-msgid "IMEI too long, cannot contain more than %(max)s characters"
-msgstr "IMEI terlalu panjang, tidak dapat berisi lebih dari %(max) karakter"
+msgid "IMEI too long, cannot contain more than %(max)d characters"
+msgstr "IMEI terlalu panjang, tidak dapat berisi lebih dari %(max)d karakter"
 
 #: app/api/v1/schema/validations.py:53
 msgid "IMEI is invalid."
