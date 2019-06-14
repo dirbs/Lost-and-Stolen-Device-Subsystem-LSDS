@@ -302,3 +302,6 @@ msgstr "nama model tidak valid. Tidak sesuai dengan bahasa yang dipilih atau for
 
 msgid "Email is invalid."
 msgstr "Email tidak valid."
+
+msgid "N/A"
+msgstr "T/A"

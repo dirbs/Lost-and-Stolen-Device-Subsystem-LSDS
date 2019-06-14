@@ -45,6 +45,7 @@
 """
 
 from app import db
+from flask_babel import _
 
 
 class CasePersonalDetails(db.Model):
@@ -72,12 +73,12 @@ class CasePersonalDetails(db.Model):
     def serialize(self):
         """Serialize data."""
         return {
-            'full_name': self.full_name,
-            'dob': self.dob,
-            'address': self.address,
-            'gin': self.gin,
-            'number': self.alternate_number,
-            'email': self.email
+            'full_name': _(self.full_name),
+            'dob': _(self.dob),
+            'address': _(self.address),
+            'gin': _(self.gin),
+            'number': _(self.alternate_number),
+            'email': _(self.email)
         }
 
     @classmethod
