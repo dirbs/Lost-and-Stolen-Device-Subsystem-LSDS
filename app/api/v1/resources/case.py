@@ -1,33 +1,58 @@
 """
- Copyright (c) 2018 Qualcomm Technologies, Inc.
+ SPDX-License-Identifier: BSD-4-Clause-Clear
+
+ Copyright (c) 2018-2019 Qualcomm Technologies, Inc.
 
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without modification, are permitted (subject to the
  limitations in the disclaimer below) provided that the following conditions are met:
+
  * Redistributions of source code must retain the above copyright notice, this list of conditions and the following
    disclaimer.
- * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
-   following disclaimer in the documentation and/or other materials provided with the distribution.
- * Neither the name of Qualcomm Technologies, Inc. nor the names of its contributors may be used to endorse or
-   promote products derived from this software without specific prior written permission.
- NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED
- BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
- TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
- SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES LOSS OF USE,
- DATA, OR PROFITS OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+   disclaimer in the documentation and/or other materials provided with the distribution.
+ * All advertising materials mentioning features or use of this software, or any deployment of this software, or
+   documentation accompanying any distribution of this software, must display the trademark/logo as per the details
+   provided here: https://www.qualcomm.com/documents/dirbs-logo-and-brand-guidelines
+ * Neither the name of Qualcomm Technologies, Inc. nor the names of its contributors may be used to endorse or promote
+   products derived from this software without specific prior written permission.
+
+ SPDX-License-Identifier: ZLIB-ACKNOWLEDGEMENT
+
+ Copyright (c) 2018-2019 Qualcomm Technologies, Inc.
+
+ This software is provided 'as-is', without any express or implied warranty. In no event will the authors be held liable
+ for any damages arising from the use of this software.
+
+ Permission is granted to anyone to use this software for any purpose, including commercial applications, and to alter
+ it and redistribute it freely, subject to the following restrictions:
+
+ * The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If
+   you use this software in a product, an acknowledgment is required by displaying the trademark/logo as per the details
+   provided here: https://www.qualcomm.com/documents/dirbs-logo-and-brand-guidelines
+ * Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+ * This notice may not be removed or altered from any source distribution.
+
+ NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY
+ THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+ BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.                                                               #
 """
 
 import json
 
-from app import app, db
+from app import db
+from flask_babel import _
 from ..assets.response import MIME_TYPES, CODES, MESSAGES
 from ..models.case import Case
 from ..assets.pagination import Pagination
-from ..schema.case import CaseInsertSchema, CaseStatusUpdateSchema, CaseUpdateSchema, CasesSchema
+from ..schema.case import CaseInsertSchema, CaseStatusUpdateSchema, CaseUpdateSchema, CasesSchema, CaseGetBlockedSchema
+from ..schema.validations import *
 
 from flask import Response
 from sqlalchemy import desc
@@ -52,7 +77,7 @@ class CaseRoutes(MethodResource):
                     data = {
 
                             "tracking_id": tracking_id,
-                            "message": "Case not found"
+                            "message": _("Case not found")
 
                             }
 
@@ -62,7 +87,7 @@ class CaseRoutes(MethodResource):
             else:
 
                 data = {
-                    "message": MESSAGES.get("UNDEFINED_TRACKING_ID")
+                    "message": _(MESSAGES.get("UNDEFINED_TRACKING_ID"))
                 }
 
                 response = Response(json.dumps(data), status=CODES.get("BAD_REQUEST"),
@@ -72,7 +97,7 @@ class CaseRoutes(MethodResource):
             app.logger.exception(e)
 
             data = {
-                "message": "Error retrieving case results. Please check tracking id or database connection."
+                "message": _("Error retrieving case results. Please check tracking id or database connection.")
             }
 
             response = Response(json.dumps(data), status=CODES.get("INTERNAL_SERVER_ERROR"),
@@ -80,15 +105,16 @@ class CaseRoutes(MethodResource):
             return response
 
     @doc(description='Update case details', tags=['Case'])
-    @use_kwargs(CaseUpdateSchema().fields_dict, locations=['json'])
+    @use_kwargs(CaseUpdateSchema().fields_dict, locations=['json', 'headers'])
     def put(self, tracking_id, **kwargs):
         """Update case personal details."""
         try:
+            case_id = Case.update_blocked_info(kwargs, tracking_id)
             case_id = Case.update(kwargs, tracking_id)
 
             if case_id == 406:
                 data = {
-                    'message': 'Case updation not allowed in this status',
+                    'message': _('Case updation not allowed in this status'),
                 }
                 response = Response(json.dumps(data), status=CODES.get("NOT_ACCEPTABLE"),
                                     mimetype=MIME_TYPES.get("APPLICATION_JSON"))
@@ -98,7 +124,7 @@ class CaseRoutes(MethodResource):
                 data = {
 
                     "tracking_id": tracking_id,
-                    "message": "Enter at least one optional field with full name in personal details."
+                    "message": _("Enter at least one optional field with full name in personal details.")
 
                 }
 
@@ -108,7 +134,7 @@ class CaseRoutes(MethodResource):
 
             if case_id:
                 data = {
-                    'message': 'Case updated successfully',
+                    'message': _('Case updated successfully'),
                     'tracking_id': tracking_id
                 }
 
@@ -119,7 +145,7 @@ class CaseRoutes(MethodResource):
                 data = {
 
                     "tracking_id": tracking_id,
-                    "message": "Case not found"
+                    "message": _("Case not found")
 
                 }
 
@@ -129,7 +155,7 @@ class CaseRoutes(MethodResource):
 
         except Exception as e:
             app.logger.exception(e)
-            data = {'message': 'Case update failed!'}
+            data = {'message': _('Case update failed!')}
             response = Response(json.dumps(data), status=CODES.get('INTERNAL_SERVER_ERROR'),
                                 mimetype=MIME_TYPES.get('APPLICATION_JSON'))
             return response
@@ -145,22 +171,22 @@ class CaseRoutes(MethodResource):
 
             if case_id == 406:
                 data = {
-                    'message': 'Case updation not allowed in this status',
-                }
+                        'message': _('Unable to update case status. Either Blocking is disabled or case has already been recovered.'),
+                    }
                 response = Response(json.dumps(data), status=CODES.get("NOT_ACCEPTABLE"),
                                     mimetype=MIME_TYPES.get("APPLICATION_JSON"))
                 return response
 
             if case_id == 409:
                 data = {
-                    'message': 'Case already has the same status.',
+                    'message': _('Case already has the same status.'),
                 }
                 response = Response(json.dumps(data), status=CODES.get("CONFLICT"),
                                     mimetype=MIME_TYPES.get("APPLICATION_JSON"))
                 return response
 
             if case_id:
-                data = {'message': 'Case status updated', 'tracking_id': tracking_id}
+                data = {'message': _('Case status updated'), 'tracking_id': tracking_id}
                 response = Response(json.dumps(data), status=CODES.get("OK"),
                                     mimetype=MIME_TYPES.get("APPLICATION_JSON"))
                 return response
@@ -168,7 +194,7 @@ class CaseRoutes(MethodResource):
                 data = {
 
                     "tracking_id": tracking_id,
-                    "message": "Case not found"
+                    "message": _("Case not found")
 
                 }
 
@@ -178,7 +204,7 @@ class CaseRoutes(MethodResource):
 
         except Exception as e:
             app.logger.exception(e)
-            data = {'message': 'Case status update failed!'}
+            data = {'message': _('Case status update failed!')}
             response = Response(json.dumps(data), status=CODES.get('INTERNAL_SERVER_ERROR'),
                                 mimetype=MIME_TYPES.get('APPLICATION_JSON'))
             return response
@@ -206,6 +232,7 @@ class CaseList(MethodResource):
                         'comment_date': comment.get('comment_date').split(' ', 1)[0]
                     })
             case_detail = {
+                    "get_blocked": case.get('get_blocked'),
                     "creator": {
                         "user_id": case.get('user_id'),
                         "username": case.get('username')
@@ -222,7 +249,7 @@ class CaseList(MethodResource):
                     "comments": comment_list,
                     "incident_details": {
                         "incident_date": case.get('date_of_incident'),
-                        "incident_nature": case.get('incident_type')
+                        "incident_nature": _(case.get('incident_type'))
                     },
                     "created_at": case.get('created_at').strftime("%Y-%m-%d %H:%M:%S"),
                     "device_details": {
@@ -232,7 +259,7 @@ class CaseList(MethodResource):
                         "msisdns": case.get('msisdns').split(','),
                         "brand": case.get('brand')
                     },
-                    "status": case.get('status'),
+                    "status": _(case.get('status')),
                     "updated_at": case.get('updated_at').strftime("%Y-%m-%d %H:%M:%S")
                 }
 
@@ -291,7 +318,7 @@ class CaseList(MethodResource):
                 return response
         except Exception as e:
             app.logger.exception(e)
-            data = {'message': "Database connectivity error. Please check connection parameters."}
+            data = {'message': _("Database connectivity error. Please check connection parameters.")}
             response = Response(json.dumps(data), status=CODES.get("INTERNAL_SERVER_ERROR"),
                                 mimetype=MIME_TYPES.get('APPLICATION_JSON'))
 
@@ -304,7 +331,7 @@ class InsertCase(MethodResource):
     """Flak resource for case insertion."""
 
     @doc(description='Insert case', tags=['Case'])
-    @use_kwargs(CaseInsertSchema().fields_dict, locations=['json'])
+    @use_kwargs(CaseInsertSchema().fields_dict, locations=['json', 'headers'])
     def post(self, **kwargs):
         """Insert case details."""
         try:
@@ -312,7 +339,7 @@ class InsertCase(MethodResource):
 
             if tracking_id.get('code') == 409:
                 data = {
-                    'message': 'IMEI: ' + tracking_id.get('data') + ' is a duplicate entry.',
+                    'message': _('IMEI: %(imei)s is a duplicate entry.',imei=tracking_id.get('data')),
                 }
                 response = Response(json.dumps(data), status=CODES.get("CONFLICT"),
                                     mimetype=MIME_TYPES.get("APPLICATION_JSON"))
@@ -320,7 +347,7 @@ class InsertCase(MethodResource):
 
             if tracking_id.get('code') == 400:
                 data = {
-                    "message": "Enter at least one optional field with full name in personal details."
+                    "message": _("Enter at least one optional field with full name in personal details.")
                 }
 
                 response = Response(json.dumps(data), status=CODES.get("BAD_REQUEST"),
@@ -329,7 +356,7 @@ class InsertCase(MethodResource):
 
             if tracking_id.get('code') == 200:
                 data = {
-                    'message': 'case successfully added',
+                    'message': _('case successfully added'),
                     'tracking_id': tracking_id.get('data')
                 }
 
@@ -338,7 +365,7 @@ class InsertCase(MethodResource):
                 return response
             else:
                 data = {
-                    'message': 'case addition failed',
+                    'message': _('case addition failed'),
                 }
 
                 response = Response(json.dumps(data), status=CODES.get('INTERNAL_SERVER_ERROR'),
@@ -349,9 +376,50 @@ class InsertCase(MethodResource):
             app.logger.exception(e)
 
             data = {
-                'message': 'case addition failed'
+                'message': _('case addition failed')
             }
 
+            response = Response(json.dumps(data), status=CODES.get('INTERNAL_SERVER_ERROR'),
+                                mimetype=MIME_TYPES.get('APPLICATION_JSON'))
+            return response
+
+
+class UpdateCase(MethodResource):
+    @doc(description='Update case information', tags=['Case'])
+    @use_kwargs(CaseGetBlockedSchema().fields_dict, locations=['json'])
+    def patch(self, tracking_id, **args):
+        """Update case get blocked information."""
+        try:
+            case_id = Case.update_blocked_info(args, tracking_id)
+
+            if case_id == 406:
+                data = {
+                    'message': _('Case updation not allowed in this status'),
+                }
+                response = Response(json.dumps(data), status=CODES.get("NOT_ACCEPTABLE"),
+                                    mimetype=MIME_TYPES.get("APPLICATION_JSON"))
+                return response
+
+            if case_id:
+                data = {'message': _('Case status updated'), 'tracking_id': tracking_id}
+                response = Response(json.dumps(data), status=CODES.get("OK"),
+                                    mimetype=MIME_TYPES.get("APPLICATION_JSON"))
+                return response
+            else:
+                data = {
+
+                    "tracking_id": tracking_id,
+                    "message": _("Case not found")
+
+                }
+
+                response = Response(json.dumps(data), status=CODES.get("NOT_FOUND"),
+                                    mimetype=MIME_TYPES.get("APPLICATION_JSON"))
+                return response
+
+        except Exception as e:
+            app.logger.exception(e)
+            data = {'message': _('Update of case information failed!')}
             response = Response(json.dumps(data), status=CODES.get('INTERNAL_SERVER_ERROR'),
                                 mimetype=MIME_TYPES.get('APPLICATION_JSON'))
             return response

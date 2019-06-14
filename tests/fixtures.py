@@ -1,25 +1,51 @@
 """
-Reusable py.test fixtures for unit tests.
-Copyright (c) 2018 Qualcomm Technologies, Inc.
+ SPDX-License-Identifier: BSD-4-Clause-Clear
+
+ Copyright (c) 2018-2019 Qualcomm Technologies, Inc.
+
  All rights reserved.
+
  Redistribution and use in source and binary forms, with or without modification, are permitted (subject to the
  limitations in the disclaimer below) provided that the following conditions are met:
+
  * Redistributions of source code must retain the above copyright notice, this list of conditions and the following
- disclaimer.
+   disclaimer.
  * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
- disclaimer in the documentation and/or other materials provided with the distribution.
+   disclaimer in the documentation and/or other materials provided with the distribution.
+ * All advertising materials mentioning features or use of this software, or any deployment of this software, or
+   documentation accompanying any distribution of this software, must display the trademark/logo as per the details
+   provided here: https://www.qualcomm.com/documents/dirbs-logo-and-brand-guidelines
  * Neither the name of Qualcomm Technologies, Inc. nor the names of its contributors may be used to endorse or promote
- products derived from this software without specific prior written permission.
+   products derived from this software without specific prior written permission.
+
+ SPDX-License-Identifier: ZLIB-ACKNOWLEDGEMENT
+
+ Copyright (c) 2018-2019 Qualcomm Technologies, Inc.
+
+ This software is provided 'as-is', without any express or implied warranty. In no event will the authors be held liable
+ for any damages arising from the use of this software.
+
+ Permission is granted to anyone to use this software for any purpose, including commercial applications, and to alter
+ it and redistribute it freely, subject to the following restrictions:
+
+ * The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If
+   you use this software in a product, an acknowledgment is required by displaying the trademark/logo as per the details
+   provided here: https://www.qualcomm.com/documents/dirbs-logo-and-brand-guidelines
+ * Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+ * This notice may not be removed or altered from any source distribution.
+
  NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY
  THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
  COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
- OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- POSSIBILITY OF SUCH DAMAGE.
+ DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+ BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.                                                               #
 """
+
 from os import path
+import shutil
 import json
 import copy
 import pytest
@@ -32,7 +58,7 @@ import yaml
 
 # pylint: disable=redefined-outer-name
 @pytest.yield_fixture(scope='session')
-def app():
+def app(tmpdir_factory):
     """Method to create an app for testing."""
     # need to import this late as it might have side effects
     from app import app as app_
@@ -46,27 +72,30 @@ def app():
     old_config = copy.copy(app_.config)
 
     # update configuration file path
-    global_config = yaml.load(open(path.abspath(path.dirname(__file__) + "/testdata/config.yml")))
+    global_config = yaml.safe_load(open(path.abspath(path.dirname(__file__) + "/testdata/config.yml")))
     app_.config['system_config'] = global_config
 
     # update configuration file path
     config = configparser.ConfigParser()
-    config.read(path.abspath(path.dirname(__file__) + "/testdata/config.ini"))
+    config.read(path.abspath(path.dirname(__file__) + "/testdata/config_test.ini"))
+
+    temp_lists = tmpdir_factory.mktemp('uploads')
 
     # update upload directories path
     app_.config['dev_config'] = config
-    app_.config['dev_config']['UPLOADS']['list_dir'] = path.abspath(path.dirname(__file__) + "/uploads")
+    app_.config['dev_config']['UPLOADS']['list_dir'] = str(temp_lists)
 
     # initialize temp database and yield app
-    with Postgresql() as postgresql:
-        app_.config['SQLALCHEMY_DATABASE_URI'] = postgresql.url()
-        yield app_
+    postgresql = Postgresql()
+    app_.config['SQLALCHEMY_DATABASE_URI'] = postgresql.url()
+    yield app_
 
-        # restore old configs after successful session
-        app_.url_map = old_url_map
-        app_.view_functions = old_view_functions
-        app_.config = old_config
-        postgresql.stop()
+    # restore old configs after successful session
+    app_.url_map = old_url_map
+    app_.view_functions = old_view_functions
+    app_.config = old_config
+    shutil.rmtree(path=str(temp_lists))
+    postgresql.stop()
 
 
 @pytest.fixture(scope='session')
@@ -128,7 +157,7 @@ def mocked_config():
     """Fixture for mocking configuration for tests."""
     mocked_config_path = path.abspath(path.dirname(__file__) + '/testdata/config.yml')
     with open(mocked_config_path) as f:
-        data = yaml.load(f)
+        data = yaml.safe_load(f)
         yield data
 
 
@@ -425,7 +454,7 @@ def dirbs_core_mock(app, mocked_tac_data, mocked_imei_data, mocked_reg_data, moc
 
     # mock dirbs core MSISDN call
     httpretty.register_uri(httpretty.GET,
-                           r'{0}/{1}/msisdn/03358276012'.format(dirbs_core_api, dirbs_core_api_version),
+                           r'{0}/{1}/msisdn/02258276012'.format(dirbs_core_api, dirbs_core_api_version),
                            body=json.dumps(mocked_msisdn_data), content_type='application/json', status=200)
 
     # mock dirbs core version call

@@ -1,27 +1,49 @@
-#######################################################################################################################
-#                                                                                                                     #
-# Copyright (c) 2018 Qualcomm Technologies, Inc.                                                                      #
-#                                                                                                                     #
-# All rights reserved.                                                                                                #
-#                                                                                                                     #
-# Redistribution and use in source and binary forms, with or without modification, are permitted (subject to the      #
-# limitations in the disclaimer below) provided that the following conditions are met:                                #
-# * Redistributions of source code must retain the above copyright notice, this list of conditions and the following  #
-#   disclaimer.                                                                                                       #
-# * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the         #
-#   following disclaimer in the documentation and/or other materials provided with the distribution.                  #
-# * Neither the name of Qualcomm Technologies, Inc. nor the names of its contributors may be used to endorse or       #
-#   promote products derived from this software without specific prior written permission.                            #
-# NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED  #
-# BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED #
-# TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT      #
-# SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR   #
-# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES LOSS OF USE,      #
-# DATA, OR PROFITS OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,      #
-# STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,   #
-# EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                                                                  #
-#                                                                                                                     #
-#######################################################################################################################
+"""
+ SPDX-License-Identifier: BSD-4-Clause-Clear
+
+ Copyright (c) 2018-2019 Qualcomm Technologies, Inc.
+
+ All rights reserved.
+
+ Redistribution and use in source and binary forms, with or without modification, are permitted (subject to the
+ limitations in the disclaimer below) provided that the following conditions are met:
+
+ * Redistributions of source code must retain the above copyright notice, this list of conditions and the following
+   disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+   disclaimer in the documentation and/or other materials provided with the distribution.
+ * All advertising materials mentioning features or use of this software, or any deployment of this software, or
+   documentation accompanying any distribution of this software, must display the trademark/logo as per the details
+   provided here: https://www.qualcomm.com/documents/dirbs-logo-and-brand-guidelines
+ * Neither the name of Qualcomm Technologies, Inc. nor the names of its contributors may be used to endorse or promote
+   products derived from this software without specific prior written permission.
+
+ SPDX-License-Identifier: ZLIB-ACKNOWLEDGEMENT
+
+ Copyright (c) 2018-2019 Qualcomm Technologies, Inc.
+
+ This software is provided 'as-is', without any express or implied warranty. In no event will the authors be held liable
+ for any damages arising from the use of this software.
+
+ Permission is granted to anyone to use this software for any purpose, including commercial applications, and to alter
+ it and redistribute it freely, subject to the following restrictions:
+
+ * The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If
+   you use this software in a product, an acknowledgment is required by displaying the trademark/logo as per the details
+   provided here: https://www.qualcomm.com/documents/dirbs-logo-and-brand-guidelines
+ * Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+ * This notice may not be removed or altered from any source distribution.
+
+ NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY
+ THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+ BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.                                                               #
+"""
+
 """This modules manages database migration commands."""
 
 import sys
@@ -32,6 +54,7 @@ from flask_migrate import Migrate, MigrateCommand
 from app.api.v1.models import *
 from app.api.v1.seeders.seeder import Seeds
 from app import app, db
+from scripts.stolen_list import GenList
 
 migrate = Migrate(app, db)
 manager = Manager(app)
@@ -62,13 +85,13 @@ def CreateView():
     try:
         for row in data:
             if row[0] is None:
-                sql = "create view search as SELECT public.case.id,public.case.tracking_id,status.description AS status, public.case.updated_at,public.case.user_id,public.case.username,nature_of_incident.name AS incident, case_incident_details.date_of_incident,case_personal_details. alternate_number,case_personal_details.dob,case_personal_details.gin,case_personal_details.email,case_personal_details.address,case_personal_details.full_name,device_details.brand,device_details.model_name as model,device_details.physical_description as description,string_agg(distinct(device_imei.imei::text), ', '::text) AS imeis, string_agg(distinct(device_msisdn.msisdn::text), ', '::text) AS msisdns FROM case_incident_details JOIN nature_of_incident ON case_incident_details.nature_of_incident = nature_of_incident.id JOIN public.case ON case_incident_details.case_id = public.case.id JOIN status ON public.case.case_status = status.id JOIN case_personal_details ON case_personal_details.case_id = public.case.id JOIN device_details ON device_details.case_id = public.case.id JOIN device_imei ON device_imei.device_id = device_details.id JOIN device_msisdn ON device_msisdn.device_id = device_details.id GROUP BY public.case.id, nature_of_incident.name, status.description, public.case.updated_at, case_incident_details.date_of_incident, case_personal_details.alternate_number, case_personal_details.dob, case_personal_details.gin, case_personal_details.email, case_personal_details.address, case_personal_details.full_name, public.case.tracking_id, device_details.brand, device_details.model_name,device_details.physical_description,public.case.user_id,public.case.username;"
+                sql = "create view search as SELECT public.case.get_blocked, public.case.id,public.case.tracking_id,status.description AS status, public.case.updated_at,public.case.user_id,public.case.username,nature_of_incident.name AS incident, case_incident_details.date_of_incident,case_personal_details. alternate_number,case_personal_details.dob,case_personal_details.gin,case_personal_details.email,case_personal_details.address,case_personal_details.full_name,device_details.brand,device_details.model_name as model,device_details.physical_description as description,string_agg(distinct(device_imei.imei::text), ', '::text) AS imeis, string_agg(distinct(device_msisdn.msisdn::text), ', '::text) AS msisdns FROM case_incident_details JOIN nature_of_incident ON case_incident_details.nature_of_incident = nature_of_incident.id JOIN public.case ON case_incident_details.case_id = public.case.id JOIN status ON public.case.case_status = status.id JOIN case_personal_details ON case_personal_details.case_id = public.case.id JOIN device_details ON device_details.case_id = public.case.id JOIN device_imei ON device_imei.device_id = device_details.id JOIN device_msisdn ON device_msisdn.device_id = device_details.id GROUP BY public.case.id, nature_of_incident.name, status.description, public.case.updated_at, case_incident_details.date_of_incident, case_personal_details.alternate_number, case_personal_details.dob, case_personal_details.gin, case_personal_details.email, case_personal_details.address, case_personal_details.full_name, public.case.tracking_id, device_details.brand, device_details.model_name,device_details.physical_description,public.case.user_id,public.case.username, public.case.get_blocked;"
                 db.engine.execute(sql)
                 return "View created successfully"
             else:
                 drop_view = "drop view search"
                 db.engine.execute(drop_view)
-                sql = "create view search as SELECT public.case.id,public.case.tracking_id,status.description AS status, public.case.updated_at,public.case.user_id,public.case.username,nature_of_incident.name AS incident, case_incident_details.date_of_incident,case_personal_details. alternate_number,case_personal_details.dob,case_personal_details.gin,case_personal_details.email,case_personal_details.address,case_personal_details.full_name,device_details.brand,device_details.model_name as model,device_details.physical_description as description,string_agg(distinct(device_imei.imei::text), ', '::text) AS imeis, string_agg(distinct(device_msisdn.msisdn::text), ', '::text) AS msisdns FROM case_incident_details JOIN nature_of_incident ON case_incident_details.nature_of_incident = nature_of_incident.id JOIN public.case ON case_incident_details.case_id = public.case.id JOIN status ON public.case.case_status = status.id JOIN case_personal_details ON case_personal_details.case_id = public.case.id JOIN device_details ON device_details.case_id = public.case.id JOIN device_imei ON device_imei.device_id = device_details.id JOIN device_msisdn ON device_msisdn.device_id = device_details.id GROUP BY public.case.id, nature_of_incident.name, status.description, public.case.updated_at, case_incident_details.date_of_incident, case_personal_details.alternate_number, case_personal_details.dob, case_personal_details.gin, case_personal_details.email, case_personal_details.address, case_personal_details.full_name, public.case.tracking_id, device_details.brand, device_details.model_name,device_details.physical_description,public.case.user_id,public.case.username;"
+                sql = "create view search as SELECT public.case.get_blocked, public.case.id,public.case.tracking_id,status.description AS status, public.case.updated_at,public.case.user_id,public.case.username,nature_of_incident.name AS incident, case_incident_details.date_of_incident,case_personal_details. alternate_number,case_personal_details.dob,case_personal_details.gin,case_personal_details.email,case_personal_details.address,case_personal_details.full_name,device_details.brand,device_details.model_name as model,device_details.physical_description as description,string_agg(distinct(device_imei.imei::text), ', '::text) AS imeis, string_agg(distinct(device_msisdn.msisdn::text), ', '::text) AS msisdns FROM case_incident_details JOIN nature_of_incident ON case_incident_details.nature_of_incident = nature_of_incident.id JOIN public.case ON case_incident_details.case_id = public.case.id JOIN status ON public.case.case_status = status.id JOIN case_personal_details ON case_personal_details.case_id = public.case.id JOIN device_details ON device_details.case_id = public.case.id JOIN device_imei ON device_imei.device_id = device_details.id JOIN device_msisdn ON device_msisdn.device_id = device_details.id GROUP BY public.case.id, nature_of_incident.name, status.description, public.case.updated_at, case_incident_details.date_of_incident, case_personal_details.alternate_number, case_personal_details.dob, case_personal_details.gin, case_personal_details.email, case_personal_details.address, case_personal_details.full_name, public.case.tracking_id, device_details.brand, device_details.model_name,device_details.physical_description,public.case.user_id,public.case.username, public.case.get_blocked;"
                 db.engine.execute(sql)
                 return "View created successfullyy"
     except Exception as e:
@@ -94,6 +117,15 @@ def DbTrigger():
         db.engine.execute(trigger)
         return "Function created successfully"
 
+
+@manager.command
+def genlist():
+    return GenList.create_list()
+
+
+@manager.command
+def GenFullList():
+    return GenList.get_full_list()
 
 if __name__ == '__main__':
     manager.run()

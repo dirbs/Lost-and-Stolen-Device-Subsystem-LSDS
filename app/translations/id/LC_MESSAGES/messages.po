@@ -1,0 +1,301 @@
+# Indonesian translations for PROJECT.
+# Copyright (C) 2019 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2019.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2019-04-22 13:00+0500\n"
+"PO-Revision-Date: 2019-04-22 13:01+0500\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: id\n"
+"Language-Team: id <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.6.0\n"
+
+#: app/api/v1/requests/args_validation.py:37
+#, python-format
+msgid "imei too short, should contain at least %(min)s characters"
+msgstr "imei terlalu pendek, harus mengandung setidaknya %(min)s karakter"
+
+#: app/api/v1/requests/args_validation.py:39
+#, python-format
+msgid "imei too long, cannot contain more than %(max)s characters"
+msgstr "imei terlalu panjang, tidak boleh mengandung lebih dari %(max)s karakter"
+
+#: app/api/v1/requests/args_validation.py:41
+msgid "invalid imei"
+msgstr "imei tidak valid"
+
+#: app/api/v1/requests/args_validation.py:48
+msgid "invalid msisdn"
+msgstr "msisdn tidak valid"
+
+#: app/api/v1/resources/admin.py:69
+msgid "Failed to retrieve IMEI response from core system."
+msgstr "Gagal mengambil respons IMEI dari sistem inti."
+
+#: app/api/v1/resources/admin.py:83
+msgid "Error generating IMEI response. Check dirbs core url."
+msgstr "Kesalahan menghasilkan respons IMEI. Periksa url inti dirbs."
+
+#: app/api/v1/resources/admin.py:143
+msgid "Error generating MSISDN response. Check dirbs core url."
+msgstr "Galat menghasilkan respons MSISDN. Periksa url inti dirbs."
+
+#: app/api/v1/resources/case.py:56 app/api/v1/resources/case.py:124
+#: app/api/v1/resources/case.py:173 app/api/v1/resources/case.py:389
+msgid "Case not found"
+msgstr "Kasus tidak ditemukan"
+
+#: app/api/v1/resources/case.py:76
+msgid ""
+"Error retrieving case results. Please check tracking id or database "
+"connection."
+msgstr "Kesalahan saat mengambil hasil kasus. Silakan periksa id pelacakan atau koneksi database."
+
+#: app/api/v1/resources/case.py:93 app/api/v1/resources/case.py:374
+msgid "Case updation not allowed in this status"
+msgstr "Pembaruan kasus tidak diizinkan dalam status ini"
+
+#: app/api/v1/resources/case.py:103 app/api/v1/resources/case.py:326
+msgid "Enter at least one optional field with full name in personal details."
+msgstr "Masukkan setidaknya satu bidang opsional dengan nama lengkap di detail pribadi."
+
+#: app/api/v1/resources/case.py:113
+msgid "Case updated successfully"
+msgstr "Case berhasil diperbarui"
+
+#: app/api/v1/resources/case.py:134
+msgid "Case update failed!"
+msgstr "Pembaruan kasus gagal!"
+
+#: app/api/v1/resources/case.py:150
+msgid ""
+"Unable to update case status. Either Blocking is disabled or case has "
+"already been recovered."
+msgstr "Tidak dapat memperbarui status kasus. Pemblokiran dinonaktifkan atau kasus sudah dipulihkan."
+
+#: app/api/v1/resources/case.py:158
+msgid "Case already has the same status."
+msgstr "Kasus sudah memiliki status yang sama."
+
+#: app/api/v1/resources/case.py:165 app/api/v1/resources/case.py:381
+msgid "Case status updated"
+msgstr "Status kasus diperbarui"
+
+#: app/api/v1/resources/case.py:183
+msgid "Case status update failed!"
+msgstr "Pembaruan status kasus gagal!"
+
+#: app/api/v1/resources/case.py:335
+msgid "case successfully added"
+msgstr "case berhasil ditambahkan"
+
+#: app/api/v1/resources/case.py:344 app/api/v1/resources/case.py:355
+msgid "case addition failed"
+msgstr "penambahan case gagal"
+
+#: app/api/v1/resources/case.py:399
+msgid "Update of case information failed!"
+msgstr "Pembaruan informasi kasus gagal!"
+
+#: app/api/v1/resources/common.py:40
+msgid "Welcome to LSDS"
+msgstr "Selamat datang di LSDS"
+
+#: app/api/v1/resources/common.py:57
+msgid "CORE connected successfully."
+msgstr "INTI berhasil terhubung."
+
+#: app/api/v1/resources/common.py:61 app/api/v1/resources/common.py:65
+msgid "CORE connection failed."
+msgstr "Koneksi INTI gagal."
+
+#: app/api/v1/resources/common.py:69
+msgid "Database connected successfully"
+msgstr "Database terhubung dengan sukses"
+
+#: app/api/v1/resources/common.py:71
+msgid "Database connection failed"
+msgstr "Koneksi basis data gagal"
+
+#: app/api/v1/resources/search.py:142
+msgid "service unavailable"
+msgstr "Layanan tidak tersedia"
+
+#: app/api/v1/resources/system.py:57 app/api/v1/resources/system.py:82
+msgid "Database connectivity error. Please check connection parameters."
+msgstr "Kesalahan konektivitas basis data. Silakan periksa parameter koneksi."
+
+#: app/api/v1/schema/validations.py:11
+msgid "name should contain more than one character"
+msgstr "nama harus mengandung lebih dari satu karakter"
+
+#: app/api/v1/schema/validations.py:13
+msgid "name cannot contain more than 1000 characters"
+msgstr "nama tidak boleh mengandung lebih dari 1000 karakter"
+
+#: app/api/v1/schema/validations.py:15
+msgid "Name cannot contain invalid characters"
+msgstr "Nama tidak boleh mengandung karakter yang tidak valid"
+
+#: app/api/v1/schema/validations.py:22
+msgid "Comment should contain more than one character"
+msgstr "Komentar harus mengandung lebih dari satu karakter"
+
+#: app/api/v1/schema/validations.py:24
+msgid "Comment cannot contain more than 1000 characters"
+msgstr "Komentar tidak boleh mengandung lebih dari 1000 karakter"
+
+#: app/api/v1/schema/validations.py:26
+msgid "Comment cannot have invalid characters"
+msgstr "Komentar tidak boleh memiliki karakter yang tidak valid"
+
+#: app/api/v1/schema/validations.py:33
+msgid "Alternate phone number is invalid."
+msgstr "Nomor telepon alternatif tidak valid."
+
+#: app/api/v1/schema/validations.py:40
+msgid "Invalid date format"
+msgstr "Format tanggal tidak valid"
+
+#: app/api/v1/schema/validations.py:49
+#, python-format
+msgid "IMEI too short, should contain at least %(min)s characters"
+msgstr "IMEI terlalu pendek, harus mengandung setidaknya %(min)s karakter"
+
+#: app/api/v1/schema/validations.py:51
+#, python-format
+msgid "IMEI too long, cannot contain more than %(max)s characters"
+msgstr "IMEI terlalu panjang, tidak dapat berisi lebih dari %(max) karakter"
+
+#: app/api/v1/schema/validations.py:53
+msgid "IMEI is invalid."
+msgstr "IMEI tidak valid."
+
+#: app/api/v1/schema/validations.py:60
+msgid "MSISDN is invalid."
+msgstr "MSISDN tidak valid"
+
+#: app/api/v1/schema/validations.py:68
+#, python-format
+msgid "Government Identification Number must contain %(range)s digits"
+msgstr "Nomor Identifikasi Pemerintah harus mengandung digit %(range)s"
+
+#: app/api/v1/schema/validations.py:74
+#, python-format
+msgid "%(field)s should contain at least %(min)s character"
+msgstr "%(field)s harus mengandung setidaknya %(min)s karakter"
+
+#: app/api/v1/schema/validations.py:76
+#, python-format
+msgid "%(field)s cannot contain more than %(max)s characters"
+msgstr "%(field)s tidak boleh mengandung lebih dari %(max)s karakter"
+
+msgid "PENDING"
+msgstr "TERTUNDA"
+
+msgid "RECOVERED"
+msgstr "PULIH"
+
+msgid "BLOCKED"
+msgstr "DIBLOKIR"
+
+msgid "LOST"
+msgstr "KALAH"
+
+msgid "STOLEN"
+msgstr "DICURI"
+
+msgid "Pending"
+msgstr "Tertunda"
+
+msgid "Recovered"
+msgstr "Pulih"
+
+msgid "Blocked"
+msgstr "Diblokir"
+
+msgid "Lost"
+msgstr "Kalah"
+
+msgid "Stolen"
+msgstr "Dicuri"
+
+msgid "System cannot accept duplicate Values"
+msgstr "Sistem tidak dapat menerima Nilai duplikat"
+
+msgid "Value is invalid. Does not match the selected language or invalid format."
+msgstr "Nilai tidak valid. Tidak cocok dengan bahasa yang dipilih atau format yang tidak valid."
+
+msgid "IMEI: %(imei)s is a duplicate entry."
+msgstr "IMEI: %(imei)s adalah entri dupliacte."
+
+msgid "Username cannot contain more than 1000 characters"
+msgstr "Nama pengguna tidak dapat berisi lebih dari 1000 karakter"
+
+msgid "Username should contain more than one character"
+msgstr "Nama pengguna harus berisi lebih dari satu karakter"
+
+msgid "Username is invalid. Does not match the selected language or invalid format."
+msgstr "Nama pengguna tidak sah. Tidak sesuai dengan bahasa yang dipilih atau format tidak valid."
+
+msgid "Fullname should contain more than one character"
+msgstr "Nama lengkap harus berisi lebih dari satu karakter"
+
+msgid "Fullname cannot contain more than 1000 characters"
+msgstr "Nama lengkap tidak dapat berisi lebih dari 1000 karakter"
+
+msgid "Fullname is invalid. Does not match the selected language or invalid format."
+msgstr "Fullname tidak valid. Tidak sesuai dengan bahasa yang dipilih atau format tidak valid."
+
+msgid "Comment should contain more than one character"
+msgstr "Komentar harus berisi lebih dari satu karakter"
+
+msgid "Comment cannot contain more than 1000 characters"
+msgstr "Komentar tidak dapat berisi lebih dari 1000 karakter"
+
+msgid "Comment is invalid. Does not match the selected language or invalid format."
+msgstr "Komentar tidak valid. Tidak sesuai dengan bahasa yang dipilih atau format tidak valid."
+
+msgid "Description should contain more than one character"
+msgstr "Deskripsi harus berisi lebih dari satu karakter"
+
+msgid "Description cannot contain more than 1000 characters"
+msgstr "Deskripsi tidak dapat berisi lebih dari 1000 karakter"
+
+msgid "Description is invalid. Does not match the selected language or invalid format."
+msgstr "Deskripsi tidak valid. Tidak sesuai dengan bahasa yang dipilih atau format tidak valid."
+
+msgid "Address should contain at least 1 character"
+msgstr "Alamat harus berisi minimal 1 karakter"
+
+msgid "Address cannot contain more than 1000 characters"
+msgstr "Alamat tidak dapat berisi lebih dari 1000 karakter"
+
+msgid "Address is invalid. Does not match the selected language or invalid format."
+msgstr "Alamat tidak valid. Tidak sesuai dengan bahasa yang dipilih atau format tidak valid."
+
+msgid "Brand should contain at least 1 character"
+msgstr "Merek harus berisi minimal 1 karakter"
+
+msgid "Brand cannot contain more than 1000 characters"
+msgstr "Merek tidak dapat berisi lebih dari 1000 karakter"
+
+msgid "Brand is invalid. Does not match the selected language or invalid format."
+msgstr "Merek tidak valid. Tidak sesuai dengan bahasa yang dipilih atau format tidak valid."
+
+msgid "Model name should contain at least 1 character"
+msgstr "Nama model harus berisi minimal 1 karakter"
+
+msgid "Model name cannot contain more than 1000 characters"
+msgstr "Nama model tidak dapat berisi lebih dari 1000 karakter"
+
+msgid "Model name is invalid. Does not match the selected language or invalid format."
+msgstr "nama model tidak valid. Tidak sesuai dengan bahasa yang dipilih atau format tidak valid."

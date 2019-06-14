@@ -1,27 +1,48 @@
-#######################################################################################################################
-#                                                                                                                     #
-# Copyright (c) 2018 Qualcomm Technologies, Inc.                                                                      #
-#                                                                                                                     #
-# All rights reserved.                                                                                                #
-#                                                                                                                     #
-# Redistribution and use in source and binary forms, with or without modification, are permitted (subject to the      #
-# limitations in the disclaimer below) provided that the following conditions are met:                                #
-# * Redistributions of source code must retain the above copyright notice, this list of conditions and the following  #
-#   disclaimer.                                                                                                       #
-# * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the         #
-#   following disclaimer in the documentation and/or other materials provided with the distribution.                  #
-# * Neither the name of Qualcomm Technologies, Inc. nor the names of its contributors may be used to endorse or       #
-#   promote products derived from this software without specific prior written permission.                            #
-# NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED  #
-# BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED #
-# TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT      #
-# SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR   #
-# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES LOSS OF USE,      #
-# DATA, OR PROFITS OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,      #
-# STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,   #
-# EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                                                                  #
-#                                                                                                                     #
-#######################################################################################################################
+"""
+ SPDX-License-Identifier: BSD-4-Clause-Clear
+
+ Copyright (c) 2018-2019 Qualcomm Technologies, Inc.
+
+ All rights reserved.
+
+ Redistribution and use in source and binary forms, with or without modification, are permitted (subject to the
+ limitations in the disclaimer below) provided that the following conditions are met:
+
+ * Redistributions of source code must retain the above copyright notice, this list of conditions and the following
+   disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+   disclaimer in the documentation and/or other materials provided with the distribution.
+ * All advertising materials mentioning features or use of this software, or any deployment of this software, or
+   documentation accompanying any distribution of this software, must display the trademark/logo as per the details
+   provided here: https://www.qualcomm.com/documents/dirbs-logo-and-brand-guidelines
+ * Neither the name of Qualcomm Technologies, Inc. nor the names of its contributors may be used to endorse or promote
+   products derived from this software without specific prior written permission.
+
+ SPDX-License-Identifier: ZLIB-ACKNOWLEDGEMENT
+
+ Copyright (c) 2018-2019 Qualcomm Technologies, Inc.
+
+ This software is provided 'as-is', without any express or implied warranty. In no event will the authors be held liable
+ for any damages arising from the use of this software.
+
+ Permission is granted to anyone to use this software for any purpose, including commercial applications, and to alter
+ it and redistribute it freely, subject to the following restrictions:
+
+ * The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If
+   you use this software in a product, an acknowledgment is required by displaying the trademark/logo as per the details
+   provided here: https://www.qualcomm.com/documents/dirbs-logo-and-brand-guidelines
+ * Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+ * This notice may not be removed or altered from any source distribution.
+
+ NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY
+ THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+ BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.                                                               #
+"""
 
 # noinspection PyProtectedMember
 from sqlalchemy.orm.collections import InstrumentedList
@@ -50,7 +71,7 @@ class Case(db.Model):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, server_default=db.func.now(),
                            onupdate=db.func.now())
-
+    get_blocked = db.Column(db.Boolean)
     case_incident_details = db.relationship("CaseIncidentDetails", backref="case", passive_deletes=True, lazy=True)
     case_personal_details = db.relationship("CasePersonalDetails", backref="case", passive_deletes=True, lazy=True)
     device_details = db.relationship("DeviceDetails", backref="case", passive_deletes=True, lazy=True)
@@ -61,6 +82,7 @@ class Case(db.Model):
         self.user_id = args.get("loggedin_user").get("user_id")
         self.username = args.get("loggedin_user").get("username")
         self.case_status = case_status
+        self.get_blocked = args.get("case_details").get("get_blocked")
 
     @property
     def serialize(self):
@@ -72,6 +94,7 @@ class Case(db.Model):
             },
             "tracking_id": self.tracking_id,
             "status": self.Status.serialize,
+            "get_blocked": self.get_blocked,
             "created_at": self.created_at.strftime("%Y-%m-%d %H:%M:%S") if self.created_at else 'N/A',
             "updated_at": self.updated_at.strftime("%Y-%m-%d %H:%M:%S") if self.updated_at else 'N/A',
             "incident_details": self.__get_obj(self.case_incident_details).serialize,
@@ -167,6 +190,18 @@ class Case(db.Model):
             raise Exception
 
     @classmethod
+    def update_case_info(cls, args, case_id):
+        """Update get blocked column in case model."""
+        try:
+            case = cls.query.filter_by(id=case_id).first()
+            case.get_blocked = args["get_blocked"] if args.get("get_blocked") is not None else case.get_blocked
+            db.session.add(case)
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            raise Exception
+
+    @classmethod
     def update(cls, args, tracking_id):
         """Update personal details by tracking id."""
         try:
@@ -175,7 +210,7 @@ class Case(db.Model):
                 if case.case_status == 3:
 
                     personal_details = args.get("personal_details")
-                    status_args = args.get('status_args')
+                    # status_args = args.get('status_args')
 
                     if any(item is not None for item in [personal_details.get('email'), personal_details.get('dob'),
                                                          personal_details.get('address'), personal_details.get('gin'),
@@ -183,8 +218,8 @@ class Case(db.Model):
 
                         CasePersonalDetails.update(personal_details, case.id)
 
-                        CaseComments.add(status_args.get('case_comment'), case.id, status_args.get('user_id'),
-                                         status_args.get('username'))
+                        # CaseComments.add(status_args.get('case_comment'), case.id, status_args.get('user_id'),
+                        #                status_args.get('username'))
 
                         Case.update_case(tracking_id)
 
@@ -203,21 +238,62 @@ class Case(db.Model):
             db.session.close()
 
     @classmethod
+    def update_blocked_info(cls, args, tracking_id):
+        """Update case get blocked information by tracking id."""
+        try:
+            case = cls.query.filter_by(tracking_id=tracking_id).first()
+            if case:
+                if case.case_status == 3:
+                    case_details = args.get("case_details")
+                    status_args = args.get('status_args')
+
+                    Case.update_case_info(case_details, case.id)
+
+                    CaseComments.add(status_args.get('case_comment'), case.id, status_args.get('user_id'),
+                                     status_args.get('username'))
+
+                    Case.update_case(tracking_id)
+
+                    db.session.commit()
+                    return case.tracking_id
+                else:
+                    return CODES.get('NOT_ACCEPTABLE')
+            else:
+                return None
+        except Exception:
+            db.session.rollback()
+            raise Exception
+        finally:
+            db.session.close()
+
+    @classmethod
     def update_status(cls, args, tracking_id):
         """Update status."""
         try:
             case = cls.query.filter_by(tracking_id=tracking_id).first()
             if case:
-                if (case.case_status == 2 and args.get('case_status') != 3) or (case.case_status == 3):
-                    if case.case_status != args.get('case_status'):
-                        case.case_status = args.get('case_status')
-                        CaseComments.add(args.get('case_comment'), case.id, args.get('user_id'), args.get('username'))
-                        db.session.commit()
-                        return case.tracking_id
+                if case.get_blocked:
+                    if (case.case_status == 2 and args.get('case_status') != 3) or (case.case_status == 3):
+                        if case.case_status != args.get('case_status'):
+                            case.case_status = args.get('case_status')
+                            CaseComments.add(args.get('case_comment'), case.id, args.get('user_id'), args.get('username'))
+                            db.session.commit()
+                            return case.tracking_id
+                        else:
+                            return CODES.get('CONFLICT')
                     else:
-                        return CODES.get('CONFLICT')
+                        return CODES.get('NOT_ACCEPTABLE')
                 else:
-                    return CODES.get('NOT_ACCEPTABLE')
+                    if case.case_status == 3 and args.get('case_status') != 2:
+                        if case.case_status != args.get('case_status'):
+                            case.case_status = args.get('case_status')
+                            CaseComments.add(args.get('case_comment'), case.id, args.get('user_id'), args.get('username'))
+                            db.session.commit()
+                            return case.tracking_id
+                        else:
+                            return CODES.get('CONFLICT')
+                    else:
+                        return CODES.get('NOT_ACCEPTABLE')
             else:
                 return None
         except Exception:

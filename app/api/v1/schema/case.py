@@ -1,20 +1,72 @@
+"""
+ SPDX-License-Identifier: BSD-4-Clause-Clear
+
+ Copyright (c) 2018-2019 Qualcomm Technologies, Inc.
+
+ All rights reserved.
+
+ Redistribution and use in source and binary forms, with or without modification, are permitted (subject to the
+ limitations in the disclaimer below) provided that the following conditions are met:
+
+ * Redistributions of source code must retain the above copyright notice, this list of conditions and the following
+   disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+   disclaimer in the documentation and/or other materials provided with the distribution.
+ * All advertising materials mentioning features or use of this software, or any deployment of this software, or
+   documentation accompanying any distribution of this software, must display the trademark/logo as per the details
+   provided here: https://www.qualcomm.com/documents/dirbs-logo-and-brand-guidelines
+ * Neither the name of Qualcomm Technologies, Inc. nor the names of its contributors may be used to endorse or promote
+   products derived from this software without specific prior written permission.
+
+ SPDX-License-Identifier: ZLIB-ACKNOWLEDGEMENT
+
+ Copyright (c) 2018-2019 Qualcomm Technologies, Inc.
+
+ This software is provided 'as-is', without any express or implied warranty. In no event will the authors be held liable
+ for any damages arising from the use of this software.
+
+ Permission is granted to anyone to use this software for any purpose, including commercial applications, and to alter
+ it and redistribute it freely, subject to the following restrictions:
+
+ * The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If
+   you use this software in a product, an acknowledgment is required by displaying the trademark/logo as per the details
+   provided here: https://www.qualcomm.com/documents/dirbs-logo-and-brand-guidelines
+ * Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+ * This notice may not be removed or altered from any source distribution.
+
+ NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY
+ THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+ BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.                                                               #
+"""
+
 from marshmallow import fields, Schema, pre_dump
 from .validations import *
+from flask_babel import _
+
+
+class CaseDetailsSchema(Schema):
+    """Case details"""
+    get_blocked = fields.Boolean(required=True)
 
 
 class UserSchema(Schema):
     """User schema."""
     user_id = fields.Str(required=True)
-    username = fields.Str(required=True, validate=validate_name)
+    username = fields.Str(required=True, validate=validate_username)
     case_comment = fields.Str(required=True, validate=validate_comment)
     case_status = fields.Int(required=True, validate=lambda p: p == 1 or p == 2 or p == 3)
 
 
 class PersonalDetailsSchema(Schema):
     """Personal details schema."""
-    full_name = fields.Str(required=True, validate=validate_name)
+    full_name = fields.Str(required=True, validate=validate_fullname)
     gin = fields.Str(validate=validate_gin)
-    address = fields.Str(validate=lambda p: validate_others(p, 1, 1000, 'address'))
+    address = fields.Str(validate=validate_address)
     email = fields.Email()
     dob = fields.Str(validate=validate_date)
     number = fields.Str(validate=validate_number)
@@ -28,15 +80,16 @@ class IncidentDetailsSchema(Schema):
 
 class DeviceDetailsSchema(Schema):
     """Device details schema."""
-    brand = fields.Str(required=True, validate=lambda p: validate_others(p, 1, 1000, 'brand name'))
-    model_name = fields.Str(required=True, validate=lambda p: validate_others(p, 1, 1000, 'model name'))
-    description = fields.Str(required=True, validate=lambda p: validate_others(p, 1, 1000, 'description'))
-    imeis = fields.List(fields.Str(required=True, validate=validate_imei))
-    msisdns = fields.List(fields.Str(required=True, validate=validate_msisdn))
+    brand = fields.Str(required=True, validate=validate_brand)
+    model_name = fields.Str(required=True, validate=validate_model_name)
+    description = fields.Str(required=True, validate=validate_description)
+    imeis = fields.List(fields.Str(required=True, validate=validate_imei), validate=block_duplicates, required=True)
+    msisdns = fields.List(fields.Str(required=True, validate=validate_msisdn), validate=block_duplicates, required=True)
 
 
 class CaseInsertSchema(Schema):
     """Case Insertion schema."""
+    case_details = fields.Nested(CaseDetailsSchema)
     loggedin_user = fields.Nested(UserSchema, only=['username', 'user_id'])
     incident_details = fields.Nested(IncidentDetailsSchema)
     personal_details = fields.Nested(PersonalDetailsSchema)
@@ -51,7 +104,19 @@ class CaseInsertSchema(Schema):
 class CaseUpdateSchema(Schema):
     """Update case schema."""
     status_args = fields.Nested(UserSchema, only=['username', 'user_id', 'case_comment'], required=True)
-    personal_details = fields.Nested(PersonalDetailsSchema, required=True)
+    personal_details = fields.Nested(PersonalDetailsSchema)
+    case_details = fields.Nested(CaseDetailsSchema)
+
+    @property
+    def fields_dict(self):
+        """Convert declared fields to dictionary."""
+        return self._declared_fields
+
+
+class CaseGetBlockedSchema(Schema):
+    """Update case schema."""
+    status_args = fields.Nested(UserSchema, only=['username', 'user_id', 'case_comment'], required=True)
+    case_details = fields.Nested(CaseDetailsSchema)
 
     @property
     def fields_dict(self):
@@ -118,6 +183,7 @@ class SearchResponseSchema(Schema):
     tracking_id = fields.Str(attribute='tracking_id')
     status = fields.Str(attribute='status')
     updated_at = fields.Str(attribute='updated_at')
+    get_blocked = fields.Boolean(attribute='get_blocked')
     incident_details = fields.Dict(attribute='incident_details')
     personal_details = fields.Dict(attribute='personal_details')
     creator = fields.Dict(attribute='creator')
@@ -125,10 +191,11 @@ class SearchResponseSchema(Schema):
 
     @pre_dump
     def serialize_data(self, data):
+        data['status'] = _(data.get('status'))
         data['updated_at'] = data['updated_at'].strftime("%Y-%m-%data %H:%M:%S")
         data['incident_details'] = {
             "incident_date": data.get('date_of_incident'),
-            "incident_nature": data.get('incident')
+            "incident_nature": _(data.get('incident'))
         }
         data['personal_details'] = {
             "full_name": data.get('full_name'),
