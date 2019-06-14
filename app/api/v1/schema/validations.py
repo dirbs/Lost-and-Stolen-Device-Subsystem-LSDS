@@ -121,9 +121,9 @@ def validate_imei(val):
     min_imei_length = app.config['system_config']['global'].get('min_imei_length')
     max_imei_length = app.config['system_config']['global'].get('max_imei_length')
     if len(val) < min_imei_length:
-        raise ValidationError(_("IMEI too short, should contain at least %(min)s characters", min=min_imei_length))
+        raise ValidationError(_("IMEI too short, should contain at least %(min)d characters", min=min_imei_length))
     if len(val) > max_imei_length:
-        raise ValidationError(_("IMEI too long, cannot contain more than %(max)s characters", max=max_imei_length))
+        raise ValidationError(_("IMEI too long, cannot contain more than %(max)d characters", max=max_imei_length))
     if match is None:
         raise ValidationError(_("IMEI is invalid."))
 
