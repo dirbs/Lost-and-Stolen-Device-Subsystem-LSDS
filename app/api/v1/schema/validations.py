@@ -101,6 +101,13 @@ def validate_number(val):
         raise ValidationError(_("Alternate phone number is invalid."))
 
 
+def validate_email(val):
+    """Validate phone number format."""
+    match = re.match(app.config['system_config']['validation'].get('email'), val)
+    if match is None:
+        raise ValidationError(_("Email is invalid."))
+
+
 def validate_date(val):
     """Validate date format."""
     match = re.match(app.config['system_config']['validation'].get('date'), str(val))

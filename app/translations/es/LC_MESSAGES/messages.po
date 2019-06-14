@@ -300,4 +300,6 @@ msgstr "Nombre del modelo no puede contener más de 1000 caracteres"
 msgid "Model name is invalid. Does not match the selected language or invalid format."
 msgstr "Nombre del modelo no es válido. No coincide con el idioma seleccionado o formato no válido."
 
+msgid "Email is invalid."
+msgstr "El correo electrónico es invalido."
 
