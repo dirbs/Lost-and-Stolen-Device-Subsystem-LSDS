@@ -167,13 +167,13 @@ msgstr "Formato de fecha no válido"
 
 #: app/api/v1/schema/validations.py:49
 #, python-format
-msgid "IMEI too short, should contain at least %(min)s characters"
-msgstr "IMEI demasiado corto, debe contener al menos %(min)s caracteres"
+msgid "IMEI too short, should contain at least %(min)d characters"
+msgstr "IMEI demasiado corto, debe contener al menos %(min)d caracteres"
 
 #: app/api/v1/schema/validations.py:51
 #, python-format
-msgid "IMEI too long, cannot contain more than %(max)s characters"
-msgstr "IMEI demasiado largo, no puede contener más de %(max)s caracteres"
+msgid "IMEI too long, cannot contain more than %(max)d characters"
+msgstr "IMEI demasiado largo, no puede contener más de %(max)d caracteres"
 
 #: app/api/v1/schema/validations.py:53
 msgid "IMEI is invalid."
@@ -300,4 +300,6 @@ msgstr "Nombre del modelo no puede contener más de 1000 caracteres"
 msgid "Model name is invalid. Does not match the selected language or invalid format."
 msgstr "Nombre del modelo no es válido. No coincide con el idioma seleccionado o formato no válido."
 
+msgid "Email is invalid."
+msgstr "El correo electrónico es invalido."
 

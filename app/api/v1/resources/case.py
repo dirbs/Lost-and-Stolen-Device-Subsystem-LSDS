@@ -238,11 +238,11 @@ class CaseList(MethodResource):
                         "username": case.get('username')
                     },
                     "personal_details": {
-                        "address": case.get('address'),
-                        "dob": case.get('dob'),
-                        "gin": case.get('gin'),
-                        "email": case.get('email'),
-                        "number": case.get('alternate_number'),
+                        "address": _(case.get('address')),
+                        "dob": _(case.get('dob')),
+                        "gin": _(case.get('gin')),
+                        "email": _(case.get('email')),
+                        "number": _(case.get('alternate_number')),
                         "full_name": case.get('full_name')
                     },
                     "tracking_id": case.get('tracking_id'),

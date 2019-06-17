@@ -67,7 +67,7 @@ class PersonalDetailsSchema(Schema):
     full_name = fields.Str(required=True, validate=validate_fullname)
     gin = fields.Str(validate=validate_gin)
     address = fields.Str(validate=validate_address)
-    email = fields.Email()
+    email = fields.Str(validate=validate_email)
     dob = fields.Str(validate=validate_date)
     number = fields.Str(validate=validate_number)
 

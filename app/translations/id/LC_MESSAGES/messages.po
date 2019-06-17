@@ -167,13 +167,13 @@ msgstr "Format tanggal tidak valid"
 
 #: app/api/v1/schema/validations.py:49
 #, python-format
-msgid "IMEI too short, should contain at least %(min)s characters"
-msgstr "IMEI terlalu pendek, harus mengandung setidaknya %(min)s karakter"
+msgid "IMEI too short, should contain at least %(min)d characters"
+msgstr "IMEI terlalu pendek, harus mengandung setidaknya %(min)d karakter"
 
 #: app/api/v1/schema/validations.py:51
 #, python-format
-msgid "IMEI too long, cannot contain more than %(max)s characters"
-msgstr "IMEI terlalu panjang, tidak dapat berisi lebih dari %(max) karakter"
+msgid "IMEI too long, cannot contain more than %(max)d characters"
+msgstr "IMEI terlalu panjang, tidak dapat berisi lebih dari %(max)d karakter"
 
 #: app/api/v1/schema/validations.py:53
 msgid "IMEI is invalid."
@@ -253,7 +253,7 @@ msgid "Fullname cannot contain more than 1000 characters"
 msgstr "Nama lengkap tidak dapat berisi lebih dari 1000 karakter"
 
 msgid "Fullname is invalid. Does not match the selected language or invalid format."
-msgstr "Fullname tidak valid. Tidak sesuai dengan bahasa yang dipilih atau format tidak valid."
+msgstr "Nama lengkap tidak valid. Tidak sesuai dengan bahasa yang dipilih atau format tidak valid."
 
 msgid "Comment should contain more than one character"
 msgstr "Komentar harus berisi lebih dari satu karakter"
@@ -299,3 +299,9 @@ msgstr "Nama model tidak dapat berisi lebih dari 1000 karakter"
 
 msgid "Model name is invalid. Does not match the selected language or invalid format."
 msgstr "nama model tidak valid. Tidak sesuai dengan bahasa yang dipilih atau format tidak valid."
+
+msgid "Email is invalid."
+msgstr "Email tidak valid."
+
+msgid "N/A"
+msgstr "T/A"
