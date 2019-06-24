@@ -76,7 +76,7 @@ system:
 
 language_support:
   languages: ['es', 'id']
-  default: 'es'
+  default: 'en'
 
 regex:
   id:
