@@ -192,7 +192,7 @@ class SearchResponseSchema(Schema):
     @pre_dump
     def serialize_data(self, data):
         data['status'] = _(data.get('status'))
-        data['updated_at'] = data['updated_at'].strftime("%Y-%m-%data %H:%M:%S")
+        data['updated_at'] = data['updated_at'].strftime("%Y-%m-%d %H:%M:%S")
         data['incident_details'] = {
             "incident_date": data.get('date_of_incident'),
             "incident_nature": _(data.get('incident'))
