@@ -93,7 +93,7 @@ try:
 
     @babel.localeselector
     def get_locale():
-        return request.accept_languages.best_match(app.config['LANGUAGES'])
+        return app.config['BABEL_DEFAULT_LOCALE']
 
     from app.api.v1.routes import *
 

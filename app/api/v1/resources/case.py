@@ -105,7 +105,7 @@ class CaseRoutes(MethodResource):
             return response
 
     @doc(description='Update case details', tags=['Case'])
-    @use_kwargs(CaseUpdateSchema().fields_dict, locations=['json', 'headers'])
+    @use_kwargs(CaseUpdateSchema().fields_dict, locations=['json'])
     def put(self, tracking_id, **kwargs):
         """Update case personal details."""
         try:
@@ -331,7 +331,7 @@ class InsertCase(MethodResource):
     """Flak resource for case insertion."""
 
     @doc(description='Insert case', tags=['Case'])
-    @use_kwargs(CaseInsertSchema().fields_dict, locations=['json', 'headers'])
+    @use_kwargs(CaseInsertSchema().fields_dict, locations=['json'])
     def post(self, **kwargs):
         """Insert case details."""
         try:
