@@ -15,7 +15,6 @@ NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS 
 
 from flask_restful import Api
 from .resources.common import BaseRoutes
-from .resources.admin import FetchImei, FetchMsisdn
 from .resources.system import IncidentNature, CaseStatus
 from .resources.case import CaseRoutes, CaseList, InsertCase, UpdateCase
 from .resources.search import Search
@@ -30,10 +29,6 @@ apidoc = ApiDocs(app, app.config['system_config']['system']['version'])
 
 # noinspection PyTypeChecker
 api.add_resource(BaseRoutes, '/')
-# noinspection PyTypeChecker
-api.add_resource(FetchImei, '/imei/<imei>')
-# noinspection PyTypeChecker
-api.add_resource(FetchMsisdn, '/msisdn/<msisdn>')
 # noinspection PyTypeChecker
 api.add_resource(IncidentNature, '/incident_types')
 # noinspection PyTypeChecker
@@ -54,7 +49,7 @@ docs = apidoc.init_doc()
 
 def register():
     """Method to register routes for docs."""
-    for route in [BaseRoutes, FetchImei, FetchMsisdn, IncidentNature, CaseStatus, CaseList, Search,
+    for route in [BaseRoutes, IncidentNature, CaseStatus, CaseList, Search,
                   CaseRoutes, InsertCase, UpdateCase]:
         docs.register(route)
 
