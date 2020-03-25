@@ -1,3 +1,5 @@
+![Image of DIRBS Logo](https://avatars0.githubusercontent.com/u/42587891?s=100&v=4)
+
 # Lost & Stolen Device Subsystem (LSDS)
 ## License
 Copyright (c) 2019 Qualcomm Technologies, Inc.
