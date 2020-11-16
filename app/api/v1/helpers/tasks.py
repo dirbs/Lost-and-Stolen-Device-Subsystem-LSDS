@@ -27,29 +27,6 @@ from ..models.summary import Summary
 class CeleryTasks:
 
     @staticmethod
-    @celery.task
-    def block_all():
-        """Celery task for bulk request processing."""
-        try:
-            cases = CommonResources.get_pending_cases()
-            # send records for summary generation
-            with app.request_context({'wsgi.url_scheme': "", 'SERVER_PORT': "", 'SERVER_NAME': "", 'REQUEST_METHOD': ""}):
-                remaining_cases, success_list, failed_list = CommonResources.get_seen_with(cases)
-                failed_to_notify = CommonResources.notify_users(remaining_cases)
-                report = BulkCommonResources.generate_report(failed_list, failed_to_notify, "lsds_block_failed")
-                response = {"success": len(success_list),
-                            "failed": len(failed_list),
-                            "notification_failed": len(failed_to_notify),
-                            "report_name": report}
-            return {
-                "response": response,
-                "task_id": celery.current_task.request.id
-            }
-        except Exception as e:
-            app.logger.exception(e)
-            return {"response": {}, "task_id": celery.current_task.request.id}
-
-    @staticmethod
     @celery.task()
     def log_results(response, input):
         try:

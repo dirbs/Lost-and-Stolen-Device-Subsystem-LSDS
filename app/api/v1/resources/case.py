@@ -143,7 +143,6 @@ class CaseRoutes(MethodResource):
         args = kwargs.get('status_args')
         try:
             case_id = Case.update_status(args, tracking_id)
-
             if case_id == 401:
                 data = {
                     'message': _('Only admins can update case status.'),
@@ -362,25 +361,6 @@ class UpdateCase(MethodResource):
             response = Response(json.dumps(data), status=CODES.get('INTERNAL_SERVER_ERROR'),
                                 mimetype=MIME_TYPES.get('APPLICATION_JSON'))
             return response
-
-
-class BlockAll(MethodResource):
-    @doc(description='Block all pending cases', tags=['Cases'])
-    @use_kwargs(CasesSchema().fields_dict, location='query')
-    def get(self):
-        response = (CeleryTasks.block_all.s() |
-                    CeleryTasks.log_results.s(input=None)).apply_async()
-        summary_data = {
-            "tracking_id": response.parent.id,
-            "status": response.state
-        }
-        Summary.create(summary_data)
-        data = {
-            "message": _("You can track your request using this id"),
-            "task_id": response.parent.id,
-            "state": response.state
-        }
-        return Response(json.dumps(data), status=CODES.get('OK'), mimetype=MIME_TYPES.get('APPLICATION_JSON'))
 
 
 class CheckStatus(MethodResource):
