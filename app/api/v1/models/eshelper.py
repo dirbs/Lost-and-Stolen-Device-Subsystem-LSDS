@@ -105,8 +105,8 @@ class ElasticSearchResource:
             elif field == "imeis" or field == "msisdns":
                 query['query']['bool']['must'].append({"terms": {"device_details."+field: doc_to_search[field]}})
             else:
-                if field in ["father_name", "mother_name", "full_name", "address", "dob", "gin", "alternate_number",
-                             "email", "landline_number", "district"]:
+                if field in ["full_name", "address", "dob", "gin", "alternate_number",
+                             "email"]:
                     query['query']['bool']['must'].append({"match": {"personal_details."+field: doc_to_search[field]}})
                 elif field in ["brand", "model_name", "description"]:
                     query['query']['bool']['must'].append({"match": {"device_details."+field: doc_to_search[field]}})
