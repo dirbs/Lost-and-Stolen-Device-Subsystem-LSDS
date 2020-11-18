@@ -32,6 +32,9 @@ class UserSchema(Schema):
     role = fields.Str(required=True)
     case_comment = fields.Str(required=True, validate=validate_comment)
     case_status = fields.Int(required=True, validate=lambda p: p == 1 or p == 2 or p == 3)
+    # imeis = fields.List(fields.Str(required=True, validate=validate_imei), required=True)
+    # msisdns = fields.List(fields.Str(required=True, validate=validate_msisdn), required=True)
+    # incident_nature = fields.Int(required=True, validate=lambda p: p == 1 or p == 2)
 
 
 class PersonalDetailsSchema(Schema):
@@ -165,7 +168,7 @@ class SearchResponseSchemaES(Schema):
     source = fields.Str(attribute='source')
 
     @pre_dump
-    def serialize_data(self, data):
+    def serialize_data(self, data, **kwargs):
         data = data['_source']
         data['status'] = _(data.get('status'))
         return data
