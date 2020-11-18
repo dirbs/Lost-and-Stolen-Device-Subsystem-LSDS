@@ -39,7 +39,8 @@ class ElasticSearchResource:
             }
             }
             }'''
-        return es.indices.create(index=app.config['system_config']['Database']['Database'], body=mapping)
+        es.indices.delete(index=app.config['system_config']['Database']['Database'], ignore=[400, 404])
+        return es.indices.create(index=app.config['system_config']['Database']['Database'], body=mapping, ignore=400)
 
     @staticmethod
     def insert_doc(document, source):
