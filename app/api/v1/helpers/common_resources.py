@@ -176,10 +176,7 @@ class CommonResources:
                     "gin": _(case.get('gin')),
                     "email": _(case.get('email')),
                     "number": _(case.get('alternate_number')),
-                    "full_name": case.get('full_name'),
-                    "father_name": case.get('father_name'),
-                    "mother_name": case.get('mother_name'),
-                    "district": case.get('district')
+                    "full_name": case.get('full_name')
                 },
                 "tracking_id": case.get('tracking_id'),
                 "comments": comment_list,
@@ -206,8 +203,8 @@ class CommonResources:
     def get_pending_cases():
         trigger = 'SET ROLE case_user; COMMIT;'
         db.session.execute(trigger)
-        sql = "select c.*, cid.date_of_incident, cid.nature_of_incident, cpd.full_name, cpd.address, cpd.alternate_number, cpd.email, cpd.gin, cpd.father_name, cpd.mother_name, cpd.district, cpd.landline_number, dd.brand, dd.model_name, dd.physical_description, s.description as status, ni.name as incident_type, string_agg(distinct(di.imei::text), ', '::text) as imeis, string_agg(distinct(msisdn::text), ', '::text) as msisdns, string_agg(distinct(json_build_object('comment',cc.comments, 'comment_date',cc.comment_date, 'user_id',cc.user_id, 'username',cc.username, 'id',cc.id)::text), '| '::text) as comments from public.case as c left join case_comments as cc on cc.case_id=c.id, case_incident_details as cid, case_personal_details as cpd, device_details as dd, device_imei as di, device_msisdn as dm, public.status as s, public.nature_of_incident as ni where c.case_status=" + str(
-            3) + " and cid.case_id=c.id and cpd.case_id=c.id and dd.case_id=c.id and di.device_id=dd.id and dm.device_id=dd.id  and s.id=c.case_status and ni.id=cid.nature_of_incident group by c.id, cid.date_of_incident, cid.nature_of_incident, cpd.full_name, cpd.alternate_number, cpd.address, cpd.email, cpd.gin,cpd.father_name, cpd.mother_name, cpd.district, cpd.landline_number, dd.brand, dd.model_name, dd.physical_description, s.description, ni.name order by c.updated_at desc"
+        sql = "select c.*, cid.date_of_incident, cid.nature_of_incident, cpd.full_name, cpd.address, cpd.alternate_number, cpd.email, cpd.gin, dd.brand, dd.model_name, dd.physical_description, s.description as status, ni.name as incident_type, string_agg(distinct(di.imei::text), ', '::text) as imeis, string_agg(distinct(msisdn::text), ', '::text) as msisdns, string_agg(distinct(json_build_object('comment',cc.comments, 'comment_date',cc.comment_date, 'user_id',cc.user_id, 'username',cc.username, 'id',cc.id)::text), '| '::text) as comments from public.case as c left join case_comments as cc on cc.case_id=c.id, case_incident_details as cid, case_personal_details as cpd, device_details as dd, device_imei as di, device_msisdn as dm, public.status as s, public.nature_of_incident as ni where c.case_status=" + str(
+            3) + " and cid.case_id=c.id and cpd.case_id=c.id and dd.case_id=c.id and di.device_id=dd.id and dm.device_id=dd.id  and s.id=c.case_status and ni.id=cid.nature_of_incident group by c.id, cid.date_of_incident, cid.nature_of_incident, cpd.full_name, cpd.alternate_number, cpd.address, cpd.email, cpd.gin, dd.brand, dd.model_name, dd.physical_description, s.description, ni.name order by c.updated_at desc"
         cases = db.session.execute(sql)
         cases = CommonResources.serialize_cases(cases)
         return cases
