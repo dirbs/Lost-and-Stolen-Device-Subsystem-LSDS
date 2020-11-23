@@ -167,6 +167,14 @@ class CaseRoutes(MethodResource):
                                     mimetype=MIME_TYPES.get("APPLICATION_JSON"))
                 return response
 
+            if case_id == 412:
+                data = {
+                    'message': _('Case updating failed, information provided does not match'),
+                }
+                response = Response(json.dumps(data), status=CODES.get("NOT_ACCEPTABLE"),
+                                    mimetype=MIME_TYPES.get("APPLICATION_JSON"))
+                return response
+
             if case_id:
                 data = {'message': _('Case status updated'), 'tracking_id': tracking_id}
                 response = Response(json.dumps(data), status=CODES.get("OK"),

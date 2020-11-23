@@ -267,11 +267,14 @@ class Case(db.Model):
                 db.session.execute(trigger)
                 case = cls.query.filter_by(tracking_id=tracking_id).first()
                 if case:
-                    # case_copy = case.serialize
-                    # if set(args.get('msisdns')) == set(case_copy['device_details']['msisdns']) \
-                    #         and case.case_incident_details[0].nature_of_incident == args.get('incident_nature') \
-                    #         and set(args.get('imeis')) == set(case_copy['device_details']['imeis']):
-                    #     pass
+                    case_copy = case.serialize
+                    if set(args.get('msisdns')) == set(case_copy['device_details']['msisdns']) \
+                            and case.case_incident_details[0].nature_of_incident == args.get('incident_nature') \
+                            and set(args.get('imeis')) == set(case_copy['device_details']['imeis']):
+                        pass
+                    else:
+                        return CODES.get('PRECONDITION_FAILED')
+
                     if case.get_blocked:
                         if (case.case_status == 2 and args.get('case_status') != 3) or (case.case_status == 3):
                             if case.case_status != args.get('case_status'):
