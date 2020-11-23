@@ -43,7 +43,7 @@ class PersonalDetailsSchema(Schema):
     gin = fields.Str(required=True, validate=validate_gin)
     address = fields.Str(validate=validate_address)
     email = fields.Str(validate=validate_email)
-    dob = fields.Str(validate=validate_date)
+    # dob = fields.Str(validate=validate_date)
     number = fields.Str(required=True, validate=validate_number)
 
 
@@ -194,7 +194,6 @@ class SearchResponseSchema(Schema):
         }
         data['personal_details'] = {
             "full_name": data.get('full_name'),
-            "dob": data.get('dob'),
             "address": data.get('address'),
             "gin": data.get('gin'),
             "number": data.get('alternate_number'),
