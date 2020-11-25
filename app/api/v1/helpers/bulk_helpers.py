@@ -69,7 +69,9 @@ class BulkCommonResources:
                             Bulk.update_status(data['imei'])
                         else:
                             Bulk.create(data['imei'], data['msisdn'], 2, data['alternate_number'])
-                        BulkCommonResources.notify_users(data, app.config['system_config']['SMSC']['Blocked'])
+
+                        message = app.config['system_config']['SMSC']['Blocked'].replace("{input}", data['imei'])
+                        BulkCommonResources.notify_users(data, message)
                         success_list.append(data['imei'])
                     else:
                         failed_list.append({"imei": data['imei'], "status": "Data does not match"})
@@ -92,7 +94,8 @@ class BulkCommonResources:
                 else:
                     Bulk.update_status(data['imei'])
                     success_list.append(data['imei'])
-                    BulkCommonResources.notify_users(data, app.config['system_config']['SMSC']['Unblocked'])
+                    message = app.config['system_config']['SMSC']['Unblocked'].replace("{input}", data['imei'])
+                    BulkCommonResources.notify_users(data, message)
             else:
                 failed_list.append({"imei": data['imei'], "status": "Does not exist"})
                 BulkCommonResources.notify_users(data, app.config['system_config']['SMSC']['DoesNotExist'])

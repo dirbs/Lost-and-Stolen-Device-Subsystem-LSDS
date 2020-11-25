@@ -93,8 +93,8 @@ SMSC:
   Password : 'foobar'
   Text : 'some message'
   From : '1234'
-  Blocked : "Block Message"
-  Unblocked : "Unblock Message"
+  Blocked: "Your request for blocking device with IMEI(s) {input} is processed successfully"
+  Unblocked: "Your request for unblocking device with IMEI(s) {input} is processed successfully"
   InfoMismatch : "Mismatched info"
   AlreadyExist : "Data already exist"
   DoesNotExist : "Does not exist"

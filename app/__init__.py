@@ -16,6 +16,7 @@ NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS 
 import sys
 import yaml
 import configparser
+import warnings
 
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
@@ -96,6 +97,11 @@ try:
     app.config['BABEL_DEFAULT_LOCALE'] = global_config['language_support']['default']
     app.config['LANGUAGES'] = global_config['language_support']['languages']
     babel = Babel(app)
+
+    warnings.filterwarnings(
+        "ignore",
+        message="Multiple schemas resolved to the name "
+    )
 
 
     @babel.localeselector

@@ -89,7 +89,7 @@ class ElasticSearchResource:
 
     @staticmethod
     def update_doc(tracking_id, doc_to_update):
-        es.update(index=app.config['system_config']['Database']['Database'], id=tracking_id, doc_type="_doc", body=doc_to_update)
+        es.update(index=app.config['system_config']['Database']['Database'], id=tracking_id, body=doc_to_update)
         return None
 
     @staticmethod
