@@ -109,10 +109,14 @@ class ElasticSearchResource:
                 if field in ["full_name", "address", "dob", "gin", "alternate_number",
                              "email"]:
                     query['query']['bool']['must'].append({"match": {"personal_details."+field: doc_to_search[field]}})
-                elif field in ["brand", "model_name", "description"]:
-                    query['query']['bool']['must'].append({"match": {"device_details."+field: doc_to_search[field]}})
-                elif field in ["incident_nature"]:
-                    query['query']['bool']['must'].append({"match": {"incident_details."+field: doc_to_search[field]}})
+                elif field in ["brand", "model", "description"]:
+                    if field in ["model"]:
+                        query['query']['bool']['must'].append(
+                            {"match": {"device_details." + field + "_name": doc_to_search[field]}})
+                    else:
+                        query['query']['bool']['must'].append({"match": {"device_details."+field: doc_to_search[field]}})
+                elif field in ["incident"]:
+                    query['query']['bool']['must'].append({"match": {"incident_details."+field+"_nature": doc_to_search[field]}})
                 else:
                     query['query']['bool']['must'].append({"match": {field: doc_to_search[field]}})
         resp = es.search(index=app.config['system_config']['Database']['Database'], body=query)
