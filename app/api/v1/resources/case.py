@@ -390,10 +390,15 @@ class CheckStatus(MethodResource):
                         'state': _('PENDING')
                     }
                 elif result['status'] == 'SUCCESS':
-                    response = {
-                        "state": _(result['status']),
-                        "result": result['response']['response']
-                    }
+                    if not result['status'] or not result['response']['response']:
+                        response = {
+                            "state": _("task not found.")
+                        }
+                    else:
+                        response = {
+                            "state": _(result['status']),
+                            "result": result['response']['response']
+                        }
                 else:
                     # something went wrong in the background job
                     response = {
