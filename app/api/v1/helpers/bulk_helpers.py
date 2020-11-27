@@ -1,5 +1,5 @@
 """
-Copyright (c) 2018-2019 Qualcomm Technologies, Inc.
+Copyright (c) 2018-2020 Qualcomm Technologies, Inc.
 All rights reserved.
 Redistribution and use in source and binary forms, with or without modification, are permitted (subject to the limitations in the disclaimer below) provided that the following conditions are met:
 
@@ -116,7 +116,8 @@ class BulkCommonResources:
             if final_list:
                 complaint_report = pd.DataFrame(final_list)
                 report_name = report_name + str(uuid.uuid4()) + '.tsv'
-                complaint_report.to_csv(os.path.join(app.config['system_config']['UPLOADS']['report_dir'], report_name), sep= '\t')
+                complaint_report.to_csv(os.path.join(app.config['system_config']['UPLOADS']['report_dir'],
+                                                     report_name), sep='\t')
             else:
                 report_name = "report not generated."
             return report_name

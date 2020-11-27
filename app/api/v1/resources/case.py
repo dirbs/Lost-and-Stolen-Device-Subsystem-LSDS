@@ -1,5 +1,5 @@
 """
-Copyright (c) 2018-2019 Qualcomm Technologies, Inc.
+Copyright (c) 2018-2020 Qualcomm Technologies, Inc.
 All rights reserved.
 Redistribution and use in source and binary forms, with or without modification, are permitted (subject to the limitations in the disclaimer below) provided that the following conditions are met:
 
@@ -390,9 +390,9 @@ class CheckStatus(MethodResource):
                         'state': _('PENDING')
                     }
                 elif result['status'] == 'SUCCESS':
-                    if not result['status'] or not result['response']['response']:
+                    if not result['status'] or not result['response']:
                         response = {
-                            "state": _("task not found.")
+                            "state": _("Process Successful, Summary generation failed.")
                         }
                     else:
                         response = {

@@ -1,4 +1,4 @@
-# Copyright (c) 2018-2019 Qualcomm Technologies, Inc.
+# Copyright (c) 2018-2020 Qualcomm Technologies, Inc.
 # All rights reserved.
 # Redistribution and use in source and binary forms, with or without modification, are permitted (subject to the limitations in the disclaimer below) provided that the following conditions are met:
 
@@ -95,9 +95,9 @@ SMSC:
   From : '1234'
   Blocked: "Your request for blocking device with IMEI(s) {input} is processed successfully"
   Unblocked: "Your request for unblocking device with IMEI(s) {input} is processed successfully"
-  InfoMismatch : "Mismatched info"
-  AlreadyExist : "Data already exist"
-  DoesNotExist : "Does not exist"
+  InfoMismatch: "Your IMEI:{input} data is mismatched in system"
+  AlreadyExist: "Your IMEI:{input} data already exist in system"
+  DoesNotExist: "Your IMEI:{input} data already does not exist in system"
 
 
 regex:
