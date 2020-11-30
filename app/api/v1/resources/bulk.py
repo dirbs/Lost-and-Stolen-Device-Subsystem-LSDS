@@ -59,8 +59,7 @@ class BlockCases(MethodResource):
                     summary_data = {
                         "tracking_id": response.parent.id,
                         "status": response.state,
-                        "input": "file",
-                        "summary_response": response
+                        "input": "file"
                     }
                     Summary.create(summary_data)
                     data = {
