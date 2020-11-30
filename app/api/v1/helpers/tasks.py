@@ -38,7 +38,8 @@ class CeleryTasks:
             else:
                 Summary.update(input=input, status='FAILURE', response=response)
             return True
-        except Exception:
+        except Exception as e:
+            app.logger.exception(e)
             Summary.update(input=input, status='FAILURE', response=response)
             return True
 
