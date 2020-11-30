@@ -28,18 +28,18 @@ class CeleryTasks:
 
     @staticmethod
     @celery.task()
-    def log_results(response, input):
+    def log_results(response, inp):
         try:
             status = AsyncResult(response['task_id'])
             while not status.ready():
                 sleep(0.5)
             if response['response']:
-                Summary.update(input=input, status=status.state, response=response)
+                Summary.update(input=inp, status=status.state, response=response)
             else:
-                Summary.update(input=input, status='FAILURE', response=response)
+                Summary.update(input=inp, status='FAILURE', response=response)
             return True
         except Exception:
-            Summary.update(input=input, status='FAILURE', response=response)
+            Summary.update(input=inp, status='FAILURE', response=response)
             return True
 
     @staticmethod
