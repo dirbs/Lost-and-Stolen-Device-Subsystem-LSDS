@@ -32,7 +32,7 @@ class CeleryTasks:
         try:
             status = AsyncResult(response['task_id'])
             while not status.ready():
-                sleep(0.5)
+                sleep(5)
             if response['response']:
                 Summary.update(input=input, status=status.state, response=response)
             else:
