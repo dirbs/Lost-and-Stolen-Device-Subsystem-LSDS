@@ -88,7 +88,9 @@ class CommonResources:
     def subscribers(imei):
         """Return subscriber's details fetched from DIRBS core."""
         try:
-            seen_with_url = requests.get('{base}/{version}/imei/{imei}/subscribers?limit=10&offset=0&order=DESC'.format(base=app.config['system_config']['dirbs_core']['base_url'], version=app.config['system_config']['dirbs_core']['version'], imei=imei))  # dirbs core imei api call
+            seen_with_url = requests.get('{base}/{version}/imei/{imei}/subscribers?limit=10&offset=0&order=DESC'.format
+                                         (base=app.config['system_config']['dirbs_core']['base_url'],
+                                          version=app.config['system_config']['dirbs_core']['version'], imei=imei))  # dirbs core imei api call
             seen_with_resp = seen_with_url.json()
             result_size = seen_with_resp.get('_keys').get('result_size')
             result = []
