@@ -17,7 +17,6 @@ import json
 import magic
 import pandas as pd
 from flask_restful import request
-
 from flask_babel import _
 from ..assets.response import MIME_TYPES, CODES, MESSAGES
 from ..assets.error_handlers import custom_response
@@ -51,20 +50,27 @@ class BlockCases(MethodResource):
                 if 'alternate_number' in bulk_file.columns:
                     response = []
                     if args.get('action') == "block":
-                        response = (CeleryTasks.bulk_block.s(list(bulk_file.T.to_dict().values())) |
-                                    CeleryTasks.log_results.s(input="file")).apply_async()
+                        # response = (CeleryTasks.bulk_block.s(list(bulk_file.T.to_dict().values())) |
+                        #             CeleryTasks.log_results.s(input="file")).apply_async()
+                        response = CeleryTasks.bulk_block.s(list(bulk_file.T.to_dict().values())).apply_async()
                     if args.get('action') == "unblock":
-                        response = (CeleryTasks.bulk_unblock.s(list(bulk_file.T.to_dict().values())) |
-                                    CeleryTasks.log_results.s(input="file")).apply_async()
+                        # response = (CeleryTasks.bulk_unblock.s(list(bulk_file.T.to_dict().values())) |
+                        #             CeleryTasks.log_results.s(input="file")).apply_async()
+                        response = CeleryTasks.bulk_unblock.s(list(bulk_file.T.to_dict().values())).apply_async()
+
                     summary_data = {
-                        "tracking_id": response.parent.id,
+                        "tracking_id": response.id,
                         "status": response.state,
                         "input": "file"
                     }
                     Summary.create(summary_data)
+
+                    result = response.get()
+                    CeleryTasks.log_results.s(result, input="file").apply_async()
+
                     data = {
                         "message": _("You can track your request using this id"),
-                        "task_id": response.parent.id,
+                        "task_id": response.id,
                         "state": response.state
                     }
                     return Response(json.dumps(data), status=CODES.get('OK'), mimetype=MIME_TYPES.get('APPLICATION_JSON'))

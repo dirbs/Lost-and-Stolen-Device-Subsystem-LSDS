@@ -19,7 +19,6 @@ from celery.signals import task_postrun
 
 from app import celery, app, db
 from celery.result import AsyncResult
-from ..helpers.common_resources import CommonResources
 from ..helpers.bulk_helpers import BulkCommonResources
 from ..models.summary import Summary
 
