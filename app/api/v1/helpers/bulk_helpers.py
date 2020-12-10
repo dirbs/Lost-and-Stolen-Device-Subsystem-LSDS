@@ -1,5 +1,5 @@
 """
-Copyright (c) 2018-2019 Qualcomm Technologies, Inc.
+Copyright (c) 2018-2020 Qualcomm Technologies, Inc.
 All rights reserved.
 Redistribution and use in source and binary forms, with or without modification, are permitted (subject to the limitations in the disclaimer below) provided that the following conditions are met:
 
@@ -53,13 +53,16 @@ class BulkCommonResources:
             flag = Case.find_data([data['imei']])
             flag2 = Bulk.find_bulk_data([data['imei']])
             if flag:
-                BulkCommonResources.notify_users(data, app.config['system_config']['SMSC']['AlreadyExist'])
+                message = app.config['system_config']['SMSC']['AlreadyExist'].replace("{input}", data['imei'])
+                BulkCommonResources.notify_users(data, message)
                 failed_list.append({"imei": data['imei'], "status": "Exists in LSDS, reported at "+
                                                                     flag.get('created_at').strftime("%Y-%m-%d %H:%M:%S")
                                                                     +" with tracking id "+flag.get('tracking_id')+"."})
             elif flag2:
-                BulkCommonResources.notify_users(data, app.config['system_config']['SMSC']['AlreadyExist'])
-                failed_list.append({"imei": data['imei'], "status": "Exists in Bulk , reported at "+flag2.get('created_at').strftime("%Y-%m-%d %H:%M:%S")})
+                message = app.config['system_config']['SMSC']['AlreadyExist'].replace("{input}", data['imei'])
+                BulkCommonResources.notify_users(data, message)
+                failed_list.append({"imei": data['imei'], "status": "Exists in Bulk , reported at " +
+                                                                    flag2.get('created_at').strftime("%Y-%m-%d %H:%M:%S")})
             else:
                 subscribers = CommonResources.subscribers(data['imei'])
                 if subscribers['subscribers']:
@@ -69,14 +72,18 @@ class BulkCommonResources:
                             Bulk.update_status(data['imei'])
                         else:
                             Bulk.create(data['imei'], data['msisdn'], 2, data['alternate_number'])
-                        BulkCommonResources.notify_users(data, app.config['system_config']['SMSC']['Blocked'])
+
+                        message = app.config['system_config']['SMSC']['Blocked'].replace("{input}", data['imei'])
+                        BulkCommonResources.notify_users(data, message)
                         success_list.append(data['imei'])
                     else:
+                        message = app.config['system_config']['SMSC']['InfoMismatch'].replace("{input}", data['imei'])
                         failed_list.append({"imei": data['imei'], "status": "Data does not match"})
-                        BulkCommonResources.notify_users(data, app.config['system_config']['SMSC']['InfoMismatch'])
+                        BulkCommonResources.notify_users(data, message)
                 else:
+                    message = app.config['system_config']['SMSC']['InfoMismatch'].replace("{input}", data['imei'])
                     failed_list.append({"imei": data['imei'], "status": "Data does not match"})
-                    BulkCommonResources.notify_users(data, app.config['system_config']['SMSC']['InfoMismatch'])
+                    BulkCommonResources.notify_users(data, message)
         return failed_list, success_list
 
     @staticmethod
@@ -87,15 +94,18 @@ class BulkCommonResources:
             flag = Bulk.get_case(data['imei'])
             if flag:
                 if flag.get('status') == 1:
+                    message = app.config['system_config']['SMSC']['AlreadyExist'].replace("{input}", data['imei'])
                     failed_list.append({"imei": data['imei'], "status": "Already unblocked"})
-                    BulkCommonResources.notify_users(data, app.config['system_config']['SMSC']['AlreadyExist'])
+                    BulkCommonResources.notify_users(data, message)
                 else:
                     Bulk.update_status(data['imei'])
                     success_list.append(data['imei'])
-                    BulkCommonResources.notify_users(data, app.config['system_config']['SMSC']['Unblocked'])
+                    message = app.config['system_config']['SMSC']['Unblocked'].replace("{input}", data['imei'])
+                    BulkCommonResources.notify_users(data, message)
             else:
+                message = app.config['system_config']['SMSC']['DoesNotExist'].replace("{input}", data['imei'])
                 failed_list.append({"imei": data['imei'], "status": "Does not exist"})
-                BulkCommonResources.notify_users(data, app.config['system_config']['SMSC']['DoesNotExist'])
+                BulkCommonResources.notify_users(data, message)
         return failed_list, success_list
 
     @staticmethod
@@ -106,7 +116,8 @@ class BulkCommonResources:
             if final_list:
                 complaint_report = pd.DataFrame(final_list)
                 report_name = report_name + str(uuid.uuid4()) + '.tsv'
-                complaint_report.to_csv(os.path.join(app.config['system_config']['UPLOADS']['report_dir'], report_name), sep= '\t')
+                complaint_report.to_csv(os.path.join(app.config['system_config']['UPLOADS']['report_dir'],
+                                                     report_name), sep='\t')
             else:
                 report_name = "report not generated."
             return report_name

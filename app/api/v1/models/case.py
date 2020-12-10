@@ -1,5 +1,5 @@
 """
-Copyright (c) 2018-2019 Qualcomm Technologies, Inc.
+Copyright (c) 2018-2020 Qualcomm Technologies, Inc.
 All rights reserved.
 Redistribution and use in source and binary forms, with or without modification, are permitted (subject to the limitations in the disclaimer below) provided that the following conditions are met:
 
@@ -267,6 +267,14 @@ class Case(db.Model):
                 db.session.execute(trigger)
                 case = cls.query.filter_by(tracking_id=tracking_id).first()
                 if case:
+                    case_copy = case.serialize
+                    if set(args.get('msisdns')) == set(case_copy['device_details']['msisdns']) \
+                            and case.case_incident_details[0].nature_of_incident == args.get('incident_nature') \
+                            and set(args.get('imeis')) == set(case_copy['device_details']['imeis']):
+                        pass
+                    else:
+                        return CODES.get('PRECONDITION_FAILED')
+
                     if case.get_blocked:
                         if (case.case_status == 2 and args.get('case_status') != 3) or (case.case_status == 3):
                             if case.case_status != args.get('case_status'):

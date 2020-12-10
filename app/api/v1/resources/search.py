@@ -1,5 +1,5 @@
 """
-Copyright (c) 2018-2019 Qualcomm Technologies, Inc.
+Copyright (c) 2018-2020 Qualcomm Technologies, Inc.
 All rights reserved.
 Redistribution and use in source and binary forms, with or without modification, are permitted (subject to the limitations in the disclaimer below) provided that the following conditions are met:
 
@@ -174,9 +174,9 @@ class ES_Search(MethodResource):
     def get_es_results(kwargs, data):
         """paginate retrieved search data."""
         if data['hits']['hits']:  # if reported cases are resent in database
-            paginated_data = Pagination.get_paginated_list(data['hits']['hits'], '/search', start=kwargs.get('start', 1),
-                                                           limit=kwargs.get('limit', 3))
-            paginated_data['cases'] = SearchResponseSchemaES(many=True).dump(paginated_data['cases']).data
+            paginated_data = Pagination.get_paginated_list(data['hits']['hits'], '/search',
+                                                           start=kwargs.get('start', 1),limit=kwargs.get('limit', 3))
+            paginated_data['cases'] = SearchResponseSchemaES(many=True).dump(paginated_data['cases'])
             response = Response(json.dumps(paginated_data, default=str), status=CODES.get("OK"),
                                 mimetype=MIME_TYPES.get('APPLICATION_JSON'))
         else:  # if database has no reported cases

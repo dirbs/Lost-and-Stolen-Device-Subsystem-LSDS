@@ -1,5 +1,5 @@
 """
-Copyright (c) 2018-2019 Qualcomm Technologies, Inc.
+Copyright (c) 2018-2020 Qualcomm Technologies, Inc.
 All rights reserved.
 Redistribution and use in source and binary forms, with or without modification, are permitted (subject to the limitations in the disclaimer below) provided that the following conditions are met:
 
@@ -39,7 +39,8 @@ class ElasticSearchResource:
             }
             }
             }'''
-        return es.indices.create(index=app.config['system_config']['Database']['Database'], body=mapping)
+        es.indices.delete(index=app.config['system_config']['Database']['Database'], ignore=[400, 404])
+        return es.indices.create(index=app.config['system_config']['Database']['Database'], body=mapping, ignore=400)
 
     @staticmethod
     def insert_doc(document, source):
@@ -88,7 +89,7 @@ class ElasticSearchResource:
 
     @staticmethod
     def update_doc(tracking_id, doc_to_update):
-        es.update(index=app.config['system_config']['Database']['Database'], id=tracking_id, doc_type="_doc", body=doc_to_update)
+        es.update(index=app.config['system_config']['Database']['Database'], id=tracking_id, body=doc_to_update)
         return None
 
     @staticmethod
@@ -105,13 +106,17 @@ class ElasticSearchResource:
             elif field == "imeis" or field == "msisdns":
                 query['query']['bool']['must'].append({"terms": {"device_details."+field: doc_to_search[field]}})
             else:
-                if field in ["father_name", "mother_name", "full_name", "address", "dob", "gin", "alternate_number",
-                             "email", "landline_number", "district"]:
+                if field in ["full_name", "address", "dob", "gin", "alternate_number",
+                             "email"]:
                     query['query']['bool']['must'].append({"match": {"personal_details."+field: doc_to_search[field]}})
-                elif field in ["brand", "model_name", "description"]:
-                    query['query']['bool']['must'].append({"match": {"device_details."+field: doc_to_search[field]}})
-                elif field in ["incident_nature"]:
-                    query['query']['bool']['must'].append({"match": {"incident_details."+field: doc_to_search[field]}})
+                elif field in ["brand", "model", "description"]:
+                    if field in ["model"]:
+                        query['query']['bool']['must'].append(
+                            {"match": {"device_details." + field + "_name": doc_to_search[field]}})
+                    else:
+                        query['query']['bool']['must'].append({"match": {"device_details."+field: doc_to_search[field]}})
+                elif field in ["incident"]:
+                    query['query']['bool']['must'].append({"match": {"incident_details."+field+"_nature": doc_to_search[field]}})
                 else:
                     query['query']['bool']['must'].append({"match": {field: doc_to_search[field]}})
         resp = es.search(index=app.config['system_config']['Database']['Database'], body=query)

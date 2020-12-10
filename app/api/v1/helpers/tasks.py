@@ -1,5 +1,5 @@
 """
-Copyright (c) 2018-2019 Qualcomm Technologies, Inc.
+Copyright (c) 2018-2020 Qualcomm Technologies, Inc.
 All rights reserved.
 Redistribution and use in source and binary forms, with or without modification, are permitted (subject to the limitations in the disclaimer below) provided that the following conditions are met:
 
@@ -19,7 +19,6 @@ from celery.signals import task_postrun
 
 from app import celery, app, db
 from celery.result import AsyncResult
-from ..helpers.common_resources import CommonResources
 from ..helpers.bulk_helpers import BulkCommonResources
 from ..models.summary import Summary
 
@@ -27,35 +26,12 @@ from ..models.summary import Summary
 class CeleryTasks:
 
     @staticmethod
-    @celery.task
-    def block_all():
-        """Celery task for bulk request processing."""
-        try:
-            cases = CommonResources.get_pending_cases()
-            # send records for summary generation
-            with app.request_context({'wsgi.url_scheme': "", 'SERVER_PORT': "", 'SERVER_NAME': "", 'REQUEST_METHOD': ""}):
-                remaining_cases, success_list, failed_list = CommonResources.get_seen_with(cases)
-                failed_to_notify = CommonResources.notify_users(remaining_cases)
-                report = BulkCommonResources.generate_report(failed_list, failed_to_notify, "lsds_block_failed")
-                response = {"success": len(success_list),
-                            "failed": len(failed_list),
-                            "notification_failed": len(failed_to_notify),
-                            "report_name": report}
-            return {
-                "response": response,
-                "task_id": celery.current_task.request.id
-            }
-        except Exception as e:
-            app.logger.exception(e)
-            return {"response": {}, "task_id": celery.current_task.request.id}
-
-    @staticmethod
     @celery.task()
     def log_results(response, input):
         try:
             status = AsyncResult(response['task_id'])
             while not status.ready():
-                sleep(0.5)
+                sleep(5)
             if response['response']:
                 Summary.update(input=input, status=status.state, response=response)
             else:

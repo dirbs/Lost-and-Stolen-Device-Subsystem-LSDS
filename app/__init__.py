@@ -1,5 +1,5 @@
 """
-Copyright (c) 2018-2019 Qualcomm Technologies, Inc.
+Copyright (c) 2018-2020 Qualcomm Technologies, Inc.
 All rights reserved.
 Redistribution and use in source and binary forms, with or without modification, are permitted (subject to the limitations in the disclaimer below) provided that the following conditions are met:
 
@@ -16,6 +16,7 @@ NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS 
 import sys
 import yaml
 import configparser
+import warnings
 
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
@@ -96,6 +97,11 @@ try:
     app.config['BABEL_DEFAULT_LOCALE'] = global_config['language_support']['default']
     app.config['LANGUAGES'] = global_config['language_support']['languages']
     babel = Babel(app)
+
+    warnings.filterwarnings(
+        "ignore",
+        message="Multiple schemas resolved to the name "
+    )
 
 
     @babel.localeselector

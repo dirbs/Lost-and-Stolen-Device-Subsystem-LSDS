@@ -1,5 +1,5 @@
 """
-Copyright (c) 2018-2019 Qualcomm Technologies, Inc.
+Copyright (c) 2018-2020 Qualcomm Technologies, Inc.
 All rights reserved.
 Redistribution and use in source and binary forms, with or without modification, are permitted (subject to the limitations in the disclaimer below) provided that the following conditions are met:
 
@@ -143,7 +143,6 @@ class CaseRoutes(MethodResource):
         args = kwargs.get('status_args')
         try:
             case_id = Case.update_status(args, tracking_id)
-
             if case_id == 401:
                 data = {
                     'message': _('Only admins can update case status.'),
@@ -165,6 +164,14 @@ class CaseRoutes(MethodResource):
                     'message': _('Case already has the same status.'),
                 }
                 response = Response(json.dumps(data), status=CODES.get("CONFLICT"),
+                                    mimetype=MIME_TYPES.get("APPLICATION_JSON"))
+                return response
+
+            if case_id == 412:
+                data = {
+                    'message': _('Case updating failed, information provided does not match'),
+                }
+                response = Response(json.dumps(data), status=CODES.get("NOT_ACCEPTABLE"),
                                     mimetype=MIME_TYPES.get("APPLICATION_JSON"))
                 return response
 
@@ -206,7 +213,7 @@ class CaseList(MethodResource):
             if status:
                 trigger = 'SET ROLE case_user; COMMIT;'
                 db.session.execute(trigger)
-                sql = "select c.*, cid.date_of_incident, cid.nature_of_incident, cpd.full_name, cpd.address, cpd.alternate_number, cpd.email, cpd.gin, cpd.father_name, cpd.mother_name, cpd.district, cpd.landline_number, dd.brand, dd.model_name, dd.physical_description, s.description as status, ni.name as incident_type, string_agg(distinct(di.imei::text), ', '::text) as imeis, string_agg(distinct(msisdn::text), ', '::text) as msisdns, string_agg(distinct(json_build_object('comment',cc.comments, 'comment_date',cc.comment_date, 'user_id',cc.user_id, 'username',cc.username, 'id',cc.id)::text), '| '::text) as comments from public.case as c left join case_comments as cc on cc.case_id=c.id, case_incident_details as cid, case_personal_details as cpd, device_details as dd, device_imei as di, device_msisdn as dm, public.status as s, public.nature_of_incident as ni where c.case_status="+str(status)+" and cid.case_id=c.id and cpd.case_id=c.id and dd.case_id=c.id and di.device_id=dd.id and dm.device_id=dd.id  and s.id=c.case_status and ni.id=cid.nature_of_incident group by c.id, cid.date_of_incident, cid.nature_of_incident, cpd.full_name, cpd.alternate_number, cpd.address, cpd.email, cpd.gin,cpd.father_name, cpd.mother_name, cpd.district, cpd.landline_number, dd.brand, dd.model_name, dd.physical_description, s.description, ni.name order by c.updated_at desc"
+                sql = "select c.*, cid.date_of_incident, cid.nature_of_incident, cpd.full_name, cpd.address, cpd.alternate_number, cpd.email, cpd.gin, dd.brand, dd.model_name, dd.physical_description, s.description as status, ni.name as incident_type, string_agg(distinct(di.imei::text), ', '::text) as imeis, string_agg(distinct(msisdn::text), ', '::text) as msisdns, string_agg(distinct(json_build_object('comment',cc.comments, 'comment_date',cc.comment_date, 'user_id',cc.user_id, 'username',cc.username, 'id',cc.id)::text), '| '::text) as comments from public.case as c left join case_comments as cc on cc.case_id=c.id, case_incident_details as cid, case_personal_details as cpd, device_details as dd, device_imei as di, device_msisdn as dm, public.status as s, public.nature_of_incident as ni where c.case_status="+str(status)+" and cid.case_id=c.id and cpd.case_id=c.id and dd.case_id=c.id and di.device_id=dd.id and dm.device_id=dd.id  and s.id=c.case_status and ni.id=cid.nature_of_incident group by c.id, cid.date_of_incident, cid.nature_of_incident, cpd.full_name, cpd.alternate_number, cpd.address, cpd.email, cpd.gin, dd.brand, dd.model_name, dd.physical_description, s.description, ni.name order by c.updated_at desc"
                 cases = db.session.execute(sql)
                 cases = CommonResources.serialize_cases(cases)
                 if cases:
@@ -364,25 +371,6 @@ class UpdateCase(MethodResource):
             return response
 
 
-class BlockAll(MethodResource):
-    @doc(description='Block all pending cases', tags=['Cases'])
-    @use_kwargs(CasesSchema().fields_dict, location='query')
-    def get(self):
-        response = (CeleryTasks.block_all.s() |
-                    CeleryTasks.log_results.s(input=None)).apply_async()
-        summary_data = {
-            "tracking_id": response.parent.id,
-            "status": response.state
-        }
-        Summary.create(summary_data)
-        data = {
-            "message": _("You can track your request using this id"),
-            "task_id": response.parent.id,
-            "state": response.state
-        }
-        return Response(json.dumps(data), status=CODES.get('OK'), mimetype=MIME_TYPES.get('APPLICATION_JSON'))
-
-
 class CheckStatus(MethodResource):
     """Flask resource to check bulk processing status."""
 
@@ -402,10 +390,15 @@ class CheckStatus(MethodResource):
                         'state': _('PENDING')
                     }
                 elif result['status'] == 'SUCCESS':
-                    response = {
-                        "state": _(result['status']),
-                        "result": result['response']['response']
-                    }
+                    if not result['status'] or not result['response']:
+                        response = {
+                            "state": _("Process Successful, Summary generation failed.")
+                        }
+                    else:
+                        response = {
+                            "state": _(result['status']),
+                            "result": result['response']['response']
+                        }
                 else:
                     # something went wrong in the background job
                     response = {

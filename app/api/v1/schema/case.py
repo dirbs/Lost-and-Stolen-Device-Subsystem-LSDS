@@ -1,5 +1,5 @@
 """
-Copyright (c) 2018-2019 Qualcomm Technologies, Inc.
+Copyright (c) 2018-2020 Qualcomm Technologies, Inc.
 All rights reserved.
 Redistribution and use in source and binary forms, with or without modification, are permitted (subject to the limitations in the disclaimer below) provided that the following conditions are met:
 
@@ -32,6 +32,9 @@ class UserSchema(Schema):
     role = fields.Str(required=True)
     case_comment = fields.Str(required=True, validate=validate_comment)
     case_status = fields.Int(required=True, validate=lambda p: p == 1 or p == 2 or p == 3)
+    imeis = fields.List(fields.Str(required=True, validate=validate_imei), required=True)
+    msisdns = fields.List(fields.Str(required=True, validate=validate_msisdn), required=True)
+    incident_nature = fields.Int(required=True, validate=lambda p: p == 1 or p == 2)
 
 
 class PersonalDetailsSchema(Schema):
@@ -40,7 +43,7 @@ class PersonalDetailsSchema(Schema):
     gin = fields.Str(required=True, validate=validate_gin)
     address = fields.Str(validate=validate_address)
     email = fields.Str(validate=validate_email)
-    dob = fields.Str(validate=validate_date)
+    # dob = fields.Str(validate=validate_date)
     number = fields.Str(required=True, validate=validate_number)
 
 
@@ -165,7 +168,7 @@ class SearchResponseSchemaES(Schema):
     source = fields.Str(attribute='source')
 
     @pre_dump
-    def serialize_data(self, data):
+    def serialize_data(self, data, **kwargs):
         data = data['_source']
         data['status'] = _(data.get('status'))
         return data
@@ -191,7 +194,6 @@ class SearchResponseSchema(Schema):
         }
         data['personal_details'] = {
             "full_name": data.get('full_name'),
-            "dob": data.get('dob'),
             "address": data.get('address'),
             "gin": data.get('gin'),
             "number": data.get('alternate_number'),
