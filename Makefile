@@ -1,4 +1,4 @@
-# Copyright (c) 2018-2019 Qualcomm Technologies, Inc.
+# Copyright (c) 2018-2020 Qualcomm Technologies, Inc.
 # All rights reserved.
 # Redistribution and use in source and binary forms, with or without modification, are permitted (subject to the limitations in the disclaimer below) provided that the following conditions are met:
 
@@ -31,33 +31,50 @@ clean-pyc:
 
 start-dev:
 	pip3 install -r requirements.txt
+# 	pip3 install webargs==6.1.1
 	python3 run.py
 
 install-db:
-	-python3 manage.py db init
-	-python3 manage.py db migrate
-	-python3 manage.py db upgrade
-	-python3 manage.py DbTrigger
-	-python3 manage.py CreateView
-	-python3 manage.py Seed
+	python3 manage.py db init
+	python3 manage.py db migrate
+	python3 manage.py db upgrade
+	python3 manage.py DbTrigger
+	python3 manage.py CreateRoles
+	python3 manage.py Seed
 
 upgrade-db:
-	-python3 manage.py db migrate
-	-python3 manage.py db upgrade
-	-python3 manage.py DbTrigger
-	-python3 manage.py CreateView
-	-python3 manage.py Seed
+	python3 manage.py db migrate
+	python3 manage.py db upgrade
+	python3 manage.py DbTrigger
+	python3 manage.py CreateRoles
+	python3 manage.py Seed
 
 lint:
-	-pip install pylint
-	-pylint --verbose app/* scripts/* tests/* manage.py run.py
+	pip install pylint
+	pylint --verbose app/* scripts/* tests/* manage.py run.py
 
 gen-delta-list:
-	-python3 manage.py genlist
+	python3 manage.py genlist
 
 gen-full-list:
-	-python3 manage.py GenFullList
+	python3 manage.py GenFullList
 
 test:
-	-pip3 install -r test_requirements.txt
-	-pytest -v
+	pip3 install -r requirements.txt
+	pip3 install webargs==3.0.1
+	pip3 install -r test_requirements.txt
+	pytest -v
+
+migrate-data:
+	python3 manage.py MigrateData
+
+migrate-data-bulk:
+	python3 manage.py MigrateDataBulk
+
+create-index:
+	python3 manage.py CreateIndex
+
+start-celery:
+	sudo apt-get install rabbitmq-server
+	rabbitmq-server start
+	celery -A app.celery worker --loglevel=info -B

@@ -1,5 +1,5 @@
 """
-Copyright (c) 2018-2019 Qualcomm Technologies, Inc.
+Copyright (c) 2018-2020 Qualcomm Technologies, Inc.
 All rights reserved.
 Redistribution and use in source and binary forms, with or without modification, are permitted (subject to the limitations in the disclaimer below) provided that the following conditions are met:
 
@@ -10,7 +10,7 @@ Redistribution and use in source and binary forms, with or without modification,
     Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
     This notice may not be removed or altered from any source distribution.
 
-NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                                                               #
 """
 
 from app import db
@@ -21,12 +21,14 @@ class CaseIncidentDetails(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date_of_incident = db.Column(db.String(80))
     nature_of_incident = db.Column(db.Integer, db.ForeignKey('nature_of_incident.id'))
+    region_of_incident = db.Column(db.String(100))
     case_id = db.Column(db.Integer, db.ForeignKey('case.id',  ondelete='CASCADE'))
 
     def __init__(self, args, case_id):
         """Constructor"""
         self.date_of_incident = args.get("incident_date")
         self.nature_of_incident = args.get("incident_nature")
+        self.region_of_incident = args.get("region")
         self.case_id = case_id
 
     @property
@@ -34,7 +36,8 @@ class CaseIncidentDetails(db.Model):
         """Serialize data."""
         return {
             'incident_date': self.date_of_incident if self.date_of_incident else 'N/A',
-            'incident_nature': self.natureofincident.serialize
+            'incident_nature': self.natureofincident.serialize,
+            'region': self.region_of_incident
         }
 
     @classmethod

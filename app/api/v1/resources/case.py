@@ -1,5 +1,5 @@
 """
-Copyright (c) 2018-2019 Qualcomm Technologies, Inc.
+Copyright (c) 2018-2020 Qualcomm Technologies, Inc.
 All rights reserved.
 Redistribution and use in source and binary forms, with or without modification, are permitted (subject to the limitations in the disclaimer below) provided that the following conditions are met:
 
@@ -10,7 +10,7 @@ Redistribution and use in source and binary forms, with or without modification,
     Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
     This notice may not be removed or altered from any source distribution.
 
-NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                                                               #
 """
 
 import json
@@ -19,9 +19,13 @@ from app import db
 from flask_babel import _
 from ..assets.response import MIME_TYPES, CODES, MESSAGES
 from ..models.case import Case
+from ..models.summary import Summary
 from ..assets.pagination import Pagination
 from ..schema.case import CaseInsertSchema, CaseStatusUpdateSchema, CaseUpdateSchema, CasesSchema, CaseGetBlockedSchema
 from ..schema.validations import *
+from ..helpers.common_resources import CommonResources
+from ..helpers.tasks import CeleryTasks
+from ..helpers.decorators import restricted
 
 from flask import Response
 from sqlalchemy import desc
@@ -74,7 +78,8 @@ class CaseRoutes(MethodResource):
             return response
 
     @doc(description='Update case details', tags=['Case'])
-    @use_kwargs(CaseUpdateSchema().fields_dict, locations=['json'])
+    @use_kwargs(CaseUpdateSchema().fields_dict, location='json')
+    @restricted
     def put(self, tracking_id, **kwargs):
         """Update case personal details."""
         try:
@@ -130,13 +135,21 @@ class CaseRoutes(MethodResource):
             return response
 
     @doc(description='Update case status', tags=['Case'])
-    @use_kwargs(CaseStatusUpdateSchema().fields_dict, locations=['json'])
+    @use_kwargs(CaseStatusUpdateSchema().fields_dict, location='json')
+    @restricted
     def patch(self, tracking_id, **kwargs):
         """Update case status."""
 
         args = kwargs.get('status_args')
         try:
             case_id = Case.update_status(args, tracking_id)
+            if case_id == 401:
+                data = {
+                    'message': _('Only admins can update case status.'),
+                }
+                response = Response(json.dumps(data), status=CODES.get("UNAUTHORIZED"),
+                                    mimetype=MIME_TYPES.get("APPLICATION_JSON"))
+                return response
 
             if case_id == 406:
                 data = {
@@ -151,6 +164,14 @@ class CaseRoutes(MethodResource):
                     'message': _('Case already has the same status.'),
                 }
                 response = Response(json.dumps(data), status=CODES.get("CONFLICT"),
+                                    mimetype=MIME_TYPES.get("APPLICATION_JSON"))
+                return response
+
+            if case_id == 412:
+                data = {
+                    'message': _('Case updating failed, information provided does not match'),
+                }
+                response = Response(json.dumps(data), status=CODES.get("NOT_ACCEPTABLE"),
                                     mimetype=MIME_TYPES.get("APPLICATION_JSON"))
                 return response
 
@@ -182,70 +203,19 @@ class CaseRoutes(MethodResource):
 class CaseList(MethodResource):
     """Flask resource to get list of cases."""
 
-    @staticmethod
-    def serialize(cases):
-        """Serialize response."""
-        case_list = []
-        for row in cases:
-            case_list.append(dict((col, val) for col, val in row.items()))
-        cases = []
-        for case in case_list:
-            comment_list = []
-            for comment in case.get('comments').split('|'):
-                comment = json.loads(comment)
-                if comment.get('id'):
-                    comment_list.append({
-                        'comment': comment.get('comment'),
-                        'user_id': comment.get('user_id'),
-                        'username': comment.get('username'),
-                        'comment_date': comment.get('comment_date').split(' ', 1)[0]
-                    })
-            case_detail = {
-                    "get_blocked": case.get('get_blocked'),
-                    "creator": {
-                        "user_id": case.get('user_id'),
-                        "username": case.get('username')
-                    },
-                    "personal_details": {
-                        "address": _(case.get('address')),
-                        "dob": _(case.get('dob')),
-                        "gin": _(case.get('gin')),
-                        "email": _(case.get('email')),
-                        "number": _(case.get('alternate_number')),
-                        "full_name": case.get('full_name')
-                    },
-                    "tracking_id": case.get('tracking_id'),
-                    "comments": comment_list,
-                    "incident_details": {
-                        "incident_date": case.get('date_of_incident'),
-                        "incident_nature": _(case.get('incident_type'))
-                    },
-                    "created_at": case.get('created_at').strftime("%Y-%m-%d %H:%M:%S"),
-                    "device_details": {
-                        "description": case.get('physical_description'),
-                        "model_name": case.get('model_name'),
-                        "imeis": case.get('imeis').split(','),
-                        "msisdns": case.get('msisdns').split(','),
-                        "brand": case.get('brand')
-                    },
-                    "status": _(case.get('status')),
-                    "updated_at": case.get('updated_at').strftime("%Y-%m-%d %H:%M:%S")
-                }
-
-            cases.append(case_detail)
-        return cases
-
     @doc(description='Get list of cases', tags=['Cases'])
-    @use_kwargs(CasesSchema().fields_dict, locations=['query'])
+    @use_kwargs(CasesSchema().fields_dict, location='query')
     def get(self, **kwargs):
         """Return list of cases."""
 
         status = kwargs.get('status')
         try:
             if status:
-                sql = "select c.*, cid.date_of_incident, cid.nature_of_incident, cpd.full_name, cpd.address, cpd.alternate_number, cpd.dob, cpd.email, cpd.gin, dd.brand, dd.model_name, dd.physical_description, s.description as status, ni.name as incident_type, string_agg(distinct(di.imei::text), ', '::text) as imeis, string_agg(distinct(msisdn::text), ', '::text) as msisdns, string_agg(distinct(json_build_object('comment',cc.comments, 'comment_date',cc.comment_date, 'user_id',cc.user_id, 'username',cc.username, 'id',cc.id)::text), '| '::text) as comments from public.case as c left join case_comments as cc on cc.case_id=c.id, case_incident_details as cid, case_personal_details as cpd, device_details as dd, device_imei as di, device_msisdn as dm, public.status as s, public.nature_of_incident as ni where c.case_status="+str(status)+" and cid.case_id=c.id and cpd.case_id=c.id and dd.case_id=c.id and di.device_id=dd.id and dm.device_id=dd.id  and s.id=c.case_status and ni.id=cid.nature_of_incident group by c.id, cid.date_of_incident, cid.nature_of_incident, cpd.full_name, cpd.dob, cpd.alternate_number, cpd.address, cpd.email, cpd.gin, dd.brand, dd.model_name, dd.physical_description, s.description, ni.name order by c.updated_at desc"
-                cases = db.engine.execute(sql)
-                cases = CaseList.serialize(cases)
+                trigger = 'SET ROLE case_user; COMMIT;'
+                db.session.execute(trigger)
+                sql = "select c.*, cid.date_of_incident, cid.nature_of_incident, cpd.full_name, cpd.address, cpd.alternate_number, cpd.email, cpd.gin, dd.brand, dd.model_name, dd.physical_description, s.description as status, ni.name as incident_type, string_agg(distinct(di.imei::text), ', '::text) as imeis, string_agg(distinct(msisdn::text), ', '::text) as msisdns, string_agg(distinct(json_build_object('comment',cc.comments, 'comment_date',cc.comment_date, 'user_id',cc.user_id, 'username',cc.username, 'id',cc.id)::text), '| '::text) as comments from public.case as c left join case_comments as cc on cc.case_id=c.id, case_incident_details as cid, case_personal_details as cpd, device_details as dd, device_imei as di, device_msisdn as dm, public.status as s, public.nature_of_incident as ni where c.case_status="+str(status)+" and cid.case_id=c.id and cpd.case_id=c.id and dd.case_id=c.id and di.device_id=dd.id and dm.device_id=dd.id  and s.id=c.case_status and ni.id=cid.nature_of_incident group by c.id, cid.date_of_incident, cid.nature_of_incident, cpd.full_name, cpd.alternate_number, cpd.address, cpd.email, cpd.gin, dd.brand, dd.model_name, dd.physical_description, s.description, ni.name order by c.updated_at desc"
+                cases = db.session.execute(sql)
+                cases = CommonResources.serialize_cases(cases)
                 if cases:
                     data = Pagination.get_paginated_list(cases, '/cases', start=kwargs.get('start', 1),
                                                          limit=kwargs.get('limit', 3))
@@ -300,20 +270,26 @@ class InsertCase(MethodResource):
     """Flak resource for case insertion."""
 
     @doc(description='Insert case', tags=['Case'])
-    @use_kwargs(CaseInsertSchema().fields_dict, locations=['json'])
+    @use_kwargs(CaseInsertSchema().fields_dict, location='json')
     def post(self, **kwargs):
         """Insert case details."""
         try:
             tracking_id = Case.create(kwargs)
-
             if tracking_id.get('code') == 409:
-                data = {
-                    'message': _('IMEI: %(imei)s is a duplicate entry.',imei=tracking_id.get('data')),
-                }
-                response = Response(json.dumps(data), status=CODES.get("CONFLICT"),
-                                    mimetype=MIME_TYPES.get("APPLICATION_JSON"))
-                return response
-
+                if tracking_id.get('reason') == "LSDS":
+                    data = {
+                        'message': _('IMEI: %(imei)s is a duplicate entry already reported at %(created_at)s with tracking id %(id)s.', imei=tracking_id.get('data')['imei'], created_at=tracking_id.get('data')['created_at'].strftime("%Y-%m-%d %H:%M:%S"), id=tracking_id.get('data')['tracking_id']),
+                    }
+                    response = Response(json.dumps(data), status=CODES.get("CONFLICT"),
+                                        mimetype=MIME_TYPES.get("APPLICATION_JSON"))
+                    return response
+                else:
+                    data = {
+                        'message': _('IMEI: %(imei)s is already reported and blocked through Bulk.', imei=tracking_id.get('data').get('imei')),
+                    }
+                    response = Response(json.dumps(data), status=CODES.get("CONFLICT"),
+                                        mimetype=MIME_TYPES.get("APPLICATION_JSON"))
+                    return response
             if tracking_id.get('code') == 400:
                 data = {
                     "message": _("Enter at least one optional field with full name in personal details.")
@@ -355,7 +331,8 @@ class InsertCase(MethodResource):
 
 class UpdateCase(MethodResource):
     @doc(description='Update case information', tags=['Case'])
-    @use_kwargs(CaseGetBlockedSchema().fields_dict, locations=['json'])
+    @use_kwargs(CaseGetBlockedSchema().fields_dict, location='json')
+    @restricted
     def patch(self, tracking_id, **args):
         """Update case get blocked information."""
         try:
@@ -392,3 +369,44 @@ class UpdateCase(MethodResource):
             response = Response(json.dumps(data), status=CODES.get('INTERNAL_SERVER_ERROR'),
                                 mimetype=MIME_TYPES.get('APPLICATION_JSON'))
             return response
+
+
+class CheckStatus(MethodResource):
+    """Flask resource to check bulk processing status."""
+
+    @doc(description="Check bulk request status", tags=['bulk'])
+    def post(self, task_id):
+        """Returns bulk processing status and summary if processing is completed."""
+        try:
+            result = Summary.find_by_trackingid(task_id)
+            if result is None:
+                response = {
+                    "state": _("task not found.")
+                }
+            else:
+                if result['status'] == 'PENDING':
+                    # job is in progress yet
+                    response = {
+                        'state': _('PENDING')
+                    }
+                elif result['status'] == 'SUCCESS':
+                    if not result['status'] or not result['response']:
+                        response = {
+                            "state": _("Process Successful, Summary generation failed.")
+                        }
+                    else:
+                        response = {
+                            "state": _(result['status']),
+                            "result": result['response']['response']
+                        }
+                else:
+                    # something went wrong in the background job
+                    response = {
+                        'state': _('Processing Failed.')
+                    }
+            return Response(json.dumps(response), status=CODES.get('OK'), mimetype=MIME_TYPES.get('JSON'))
+        except Exception as e:
+            app.logger.info("Error occurred while retrieving status.")
+            app.logger.exception(e)
+            return Response(MESSAGES.get('INTERNAL_SERVER_ERROR'), CODES.get('INTERNAL_SERVER_ERROR'),
+                            mimetype=MIME_TYPES.get('JSON'))

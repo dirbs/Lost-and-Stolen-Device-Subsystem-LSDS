@@ -1,5 +1,5 @@
 """
-Copyright (c) 2018-2019 Qualcomm Technologies, Inc.
+Copyright (c) 2018-2020 Qualcomm Technologies, Inc.
 All rights reserved.
 Redistribution and use in source and binary forms, with or without modification, are permitted (subject to the limitations in the disclaimer below) provided that the following conditions are met:
 
@@ -10,7 +10,7 @@ Redistribution and use in source and binary forms, with or without modification,
     Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
     This notice may not be removed or altered from any source distribution.
 
-NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                                                               #
 """
 
 import json
@@ -23,7 +23,7 @@ from flask_babel import _
 
 from ..assets.response import MIME_TYPES, CODES
 from ..requests.args_validation import validate_imei, validate_msisdn
-from .common_resources import CommonResources
+from app.api.v1.helpers.common_resources import CommonResources
 
 
 class FetchImei(MethodResource):
@@ -88,8 +88,8 @@ class FetchMsisdn(MethodResource):
             validate_msisdn(msisdn)
 
             url = '{base_url}/{version}/msisdn/{msisdn}'.format(
-                base_url=app.config['dev_config']['dirbs_core']['base_url'],
-                version=app.config['dev_config']['dirbs_core']['version'],
+                base_url=app.config['system_config']['dirbs_core']['base_url'],
+                version=app.config['system_config']['dirbs_core']['version'],
                 msisdn=msisdn
             )
 
@@ -106,7 +106,7 @@ class FetchMsisdn(MethodResource):
                     "tacs": tac_list
                 }
                 headers = {'content-type': 'application/json', 'charset': 'utf-8'}
-                tac_response = requests.post('{base_url}/{version}/tac'.format(base_url=app.config['dev_config']['dirbs_core']['base_url'], version=app.config['dev_config']['dirbs_core']['version']), data=json.dumps(batch_req), headers=headers)  # dirbs core batch tac api call
+                tac_response = requests.post('{base_url}/{version}/tac'.format(base_url=app.config['system_config']['dirbs_core']['base_url'], version=app.config['system_config']['dirbs_core']['version']), data=json.dumps(batch_req), headers=headers)  # dirbs core batch tac api call
 
                 tac_response = tac_response.json()
 

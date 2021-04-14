@@ -1,5 +1,5 @@
 """
-Copyright (c) 2018-2019 Qualcomm Technologies, Inc.
+Copyright (c) 2018-2020 Qualcomm Technologies, Inc.
 All rights reserved.
 Redistribution and use in source and binary forms, with or without modification, are permitted (subject to the limitations in the disclaimer below) provided that the following conditions are met:
 
@@ -10,17 +10,21 @@ Redistribution and use in source and binary forms, with or without modification,
     Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
     This notice may not be removed or altered from any source distribution.
 
-NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                                                               #
 """
 
 import sys
 import yaml
 import configparser
+import warnings
 
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_babel import Babel
+
+from celery import Celery
+from celery.schedules import crontab
 
 app = Flask(__name__)
 CORS(app)
@@ -33,12 +37,13 @@ try:
     global_config = yaml.safe_load(open("etc/config.yml"))
     app.config['system_config'] = global_config
 
+    CeleryConf = app.config['system_config']['celery']
     db_params = {
-        'Host': app.config['dev_config']['Database']['Host'],
-        'Port': app.config['dev_config']['Database']['Port'],
-        'Database': app.config['dev_config']['Database']['Database'],
-        'User': app.config['dev_config']['Database']['UserName'],
-        'Password': app.config['dev_config']['Database']['Password']
+        'Host': app.config['system_config']['Database']['Host'],
+        'Port': app.config['system_config']['Database']['Port'],
+        'Database': app.config['system_config']['Database']['Database'],
+        'User': app.config['system_config']['Database']['UserName'],
+        'Password': app.config['system_config']['Database']['Password']
     }
 
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://%s:%s@%s:%s/%s' % \
@@ -47,17 +52,56 @@ try:
 
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-    app.config['SQLALCHEMY_POOL_SIZE'] = int(app.config['dev_config']['Database']['pool_size'])
-    app.config['SQLALCHEMY_POOL_RECYCLE'] = int(app.config['dev_config']['Database']['pool_recycle'])
-    app.config['SQLALCHEMY_MAX_OVERFLOW'] = int(app.config['dev_config']['Database']['overflow_size'])
-    app.config['SQLALCHEMY_POOL_TIMEOUT'] = int(app.config['dev_config']['Database']['pool_timeout'])
+    app.config['pool_size'] = int(app.config['system_config']['Database']['pool_size'])
+    app.config['pool_recycle'] = int(app.config['system_config']['Database']['pool_recycle'])
+    app.config['max_overflow'] = int(app.config['system_config']['Database']['overflow_size'])
+    app.config['pool_timeout'] = int(app.config['system_config']['Database']['pool_timeout'])
 
     db = SQLAlchemy()
     db.init_app(app)
 
+    # celery configurations
+    app.config['CELERY_BROKER_URL'] = CeleryConf['RabbitmqUrl']
+    app.config['result_backend'] = 'db+' + app.config['SQLALCHEMY_DATABASE_URI']  # CeleryConf['RabbitmqBackend']
+    app.config['broker_pool_limit'] = None
+
+    # register tasks
+    app.config['imports'] = CeleryConf['CeleryTasks']
+
+    # initialize celery
+    celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
+
+    # schedule task
+    celery.conf.beat_schedule = {
+        'delete-every-hour': {
+            'task': 'app.api.v1.helpers.tasks.CeleryTasks.delete_files',
+            'schedule': crontab(minute=0, hour='*/1')
+        },
+    }
+
+    # update configurations
+    celery.conf.update(app.config)
+    TaskBase = celery.Task
+
+
+    class ContextTask(TaskBase):
+        abstract = True
+
+        def __call__(self, *args, **kwargs):
+            with app.app_context():
+                return TaskBase.__call__(self, *args, **kwargs)
+
+
+    celery.Task = ContextTask
+
     app.config['BABEL_DEFAULT_LOCALE'] = global_config['language_support']['default']
     app.config['LANGUAGES'] = global_config['language_support']['languages']
     babel = Babel(app)
+
+    warnings.filterwarnings(
+        "ignore",
+        message="Multiple schemas resolved to the name "
+    )
 
 
     @babel.localeselector

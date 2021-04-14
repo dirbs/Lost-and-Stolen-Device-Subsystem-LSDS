@@ -1,5 +1,5 @@
 """
-Copyright (c) 2018-2019 Qualcomm Technologies, Inc.
+Copyright (c) 2018-2020 Qualcomm Technologies, Inc.
 All rights reserved.
 Redistribution and use in source and binary forms, with or without modification, are permitted (subject to the limitations in the disclaimer below) provided that the following conditions are met:
 
@@ -10,7 +10,7 @@ Redistribution and use in source and binary forms, with or without modification,
     Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
     This notice may not be removed or altered from any source distribution.
 
-NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                                                               #
 """
 
 from app import db
@@ -22,7 +22,6 @@ class CasePersonalDetails(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     case_id = db.Column(db.Integer, db.ForeignKey('case.id', ondelete='CASCADE'))
     full_name = db.Column(db.String(1000))
-    dob = db.Column(db.String(80), server_default='N/A')
     address = db.Column(db.Text, server_default='N/A')
     gin = db.Column(db.String(30), server_default='N/A')
     alternate_number = db.Column(db.String(30), server_default='N/A')
@@ -32,18 +31,17 @@ class CasePersonalDetails(db.Model):
         """Constructor"""
         self.case_id = case_id
         self.full_name = args.get("full_name").strip()
-        self.dob = args.get("dob")
         self.address = args.get("address").strip() if args.get("address") else args.get("address")
         self.gin = args.get("gin")
         self.alternate_number = args.get("number")
         self.email = args.get("email")
+
 
     @property
     def serialize(self):
         """Serialize data."""
         return {
             'full_name': _(self.full_name),
-            'dob': _(self.dob),
             'address': _(self.address),
             'gin': _(self.gin),
             'number': _(self.alternate_number),
@@ -66,7 +64,6 @@ class CasePersonalDetails(db.Model):
         try:
             person = cls.query.filter_by(case_id=case_id).first()
             person.full_name = args.get('full_name').strip()
-            person.dob = args.get('dob')
             person.address = args.get("address").strip() if args.get("address") else args.get("address")
             person.gin = args.get('gin')
             person.alternate_number = args.get('number')

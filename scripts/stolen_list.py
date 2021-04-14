@@ -1,5 +1,5 @@
 """
-Copyright (c) 2018-2019 Qualcomm Technologies, Inc.
+Copyright (c) 2018-2020 Qualcomm Technologies, Inc.
 All rights reserved.
 Redistribution and use in source and binary forms, with or without modification, are permitted (subject to the limitations in the disclaimer below) provided that the following conditions are met:
 
@@ -10,7 +10,7 @@ Redistribution and use in source and binary forms, with or without modification,
     Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
     This notice may not be removed or altered from any source distribution.
 
-NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                                                               #
 """
 
 import os
@@ -48,10 +48,35 @@ class GenList:
             return "Exception occurred while getting distinct imeis."
 
     @staticmethod
+    def get_distinct_bulk_imeis():
+        try:
+            app.logger.info("getting IMEIs from Bulk.")
+            response_data = []  # distinct imeis list
+            done = set()  # set of distinct IMEIs
+            sql = "select status, created_at, imei, msisdn from public.bulk"
+            query = db.engine.execute(sql)  # retrieve imeis from case, device and imei models
+            for row in reversed(list(query)):  # iterate results
+                data = dict((col, val) for col, val in row.items())  # serialize in key, value pairs
+                if data['imei'] not in done:  # save distinct imeis
+                    done.add(data['imei'])  # note it down for further iterations
+                    data['case_status'] = data['status']
+                    response_data.append(data)  # append distinct imei
+            app.logger.info("Distinct IMEI list from Database generated successfully")
+            return response_data
+        except Exception as e:
+            app.logger.critical("Exception occurred while getting distinct imeis in list generation process")
+            app.logger.exception(e)
+            return "Exception occurred while getting distinct imeis."
+
+    @staticmethod
     def create_list():
         """Generates delta stolen list."""
         try:
-            resp = GenList.get_distinct_imeis()
+            trigger = 'SET ROLE delta_list_user; COMMIT;'
+            db.session.execute(trigger)
+            resp1 = GenList.get_distinct_imeis()
+            resp2 = GenList.get_distinct_bulk_imeis()
+            resp = resp1+resp2
             app.logger.info("Comparing IMEIs with previous delta...")
             delta_list = []  # delta list
             for data in tqdm(resp):  # iterate distince imeis
@@ -100,7 +125,7 @@ class GenList:
             stolen_delta_list = pd.DataFrame(list)
             time = datetime.now().strftime("%m-%d-%YT%H%M%S")
             report_name = name+time+'.csv'
-            stolen_delta_list.to_csv(os.path.join(app.config['dev_config']['UPLOADS']['list_dir'], report_name), sep=',', index=False)  # writing stolen list to .csv file
+            stolen_delta_list.to_csv(os.path.join(app.config['system_config']['UPLOADS']['list_dir'], report_name), sep=',', index=False)  # writing stolen list to .csv file
             app.logger.info("Delta list saved successfully")
             return "List "+report_name+" has been saved successfully."
         except Exception as e:
@@ -111,11 +136,15 @@ class GenList:
     @staticmethod
     def get_full_list():
         try:
+            trigger = 'SET ROLE delta_list_user; COMMIT;'
+            db.session.execute(trigger)
             app.logger.info("Full List generation has started.")
             response_data = []  # distinct imeis list
             sql = "select case_status, created_at, i.imei from public.case as c, device_details as d, device_imei as i where d.case_id=c.id and d.id=i.device_id"
             query = db.engine.execute(sql)  # retrieve imeis from case, device and imei models
-            results = list(query)
+            resp1 = list(query)
+            resp2 = GenList.get_distinct_bulk_imeis()
+            results = resp1 + resp2
             with tqdm(total=len(results)) as pbar:
                 for row in reversed(results):  # iterate results
                     tqdm.update(pbar)

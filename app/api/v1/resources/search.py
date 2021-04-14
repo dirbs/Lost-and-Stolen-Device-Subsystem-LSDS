@@ -1,5 +1,5 @@
 """
-Copyright (c) 2018-2019 Qualcomm Technologies, Inc.
+Copyright (c) 2018-2020 Qualcomm Technologies, Inc.
 All rights reserved.
 Redistribution and use in source and binary forms, with or without modification, are permitted (subject to the limitations in the disclaimer below) provided that the following conditions are met:
 
@@ -10,7 +10,7 @@ Redistribution and use in source and binary forms, with or without modification,
     Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
     This notice may not be removed or altered from any source distribution.
 
-NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                                                               #
 """
 
 from app import app, db
@@ -21,7 +21,8 @@ from flask_babel import _
 from flask_apispec import use_kwargs, MethodResource, doc
 from ..assets.response import MIME_TYPES, CODES
 from ..assets.pagination import Pagination
-from ..schema.case import SearchSchema, SearchResponseSchema
+from ..schema.case import SearchSchema, SearchResponseSchema, SearchResponseSchemaES
+from ..models.eshelper import ElasticSearchResource
 
 
 class Search(MethodResource):
@@ -100,6 +101,8 @@ class Search(MethodResource):
     @use_kwargs(SearchSchema().fields_dict, locations=['json'])
     def post(self, **kwargs):
         """Return search results."""
+        trigger = 'SET ROLE search_user; COMMIT;'
+        db.session.execute(trigger)
         request_data = kwargs.get("search_args")
         count = len(request_data)
         sql = "select * from search"
@@ -136,3 +139,55 @@ class Search(MethodResource):
             return response
         finally:
             db.session.close()
+
+
+class ES_Search(MethodResource):
+
+    @doc(description='Search cases', tags=['Search'])
+    @use_kwargs(SearchSchema().fields_dict, location='json')
+    def post(self, **kwargs):
+        """Return search results."""
+        request_data = kwargs.get("search_args")
+        limit = kwargs.get('limit')
+        start = kwargs.get('start')
+        try:
+            result = ElasticSearchResource.search_doc(request_data, limit, start)
+            response = ES_Search.get_es_results(kwargs, result)
+            return response
+        except Exception as e:
+            app.logger.exception(e)
+            data = {
+                "start": kwargs.get('start', 1),
+                "previous": "",
+                "next": "",
+                "cases": [],
+                "count": 0,
+                "limit": kwargs.get('limit', 2),
+                "message": _("service unavailable")
+            }
+            response = Response(json.dumps(data), status=CODES.get("SERVICE_UNAVAILABLE"),
+                                mimetype=MIME_TYPES.get('APPLICATION_JSON'))
+            return response
+
+
+    @staticmethod
+    def get_es_results(kwargs, data):
+        """paginate retrieved search data."""
+        if data['hits']['hits']:  # if reported cases are resent in database
+            paginated_data = Pagination.get_paginated_list(data['hits']['hits'], '/search',
+                                                           start=kwargs.get('start', 1),limit=kwargs.get('limit', 3))
+            paginated_data['cases'] = SearchResponseSchemaES(many=True).dump(paginated_data['cases'])
+            response = Response(json.dumps(paginated_data, default=str), status=CODES.get("OK"),
+                                mimetype=MIME_TYPES.get('APPLICATION_JSON'))
+        else:  # if database has no reported cases
+            data = {
+                "start": kwargs.get('start', 1),
+                "previous": "",
+                "next": "",
+                "cases": [],
+                "count": 0,
+                "limit": kwargs.get('limit', 2)
+            }
+            response = Response(json.dumps(data, default=str), status=CODES.get("OK"),
+                                mimetype=MIME_TYPES.get('APPLICATION_JSON'))
+        return response

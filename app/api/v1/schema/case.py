@@ -1,5 +1,5 @@
 """
-Copyright (c) 2018-2019 Qualcomm Technologies, Inc.
+Copyright (c) 2018-2020 Qualcomm Technologies, Inc.
 All rights reserved.
 Redistribution and use in source and binary forms, with or without modification, are permitted (subject to the limitations in the disclaimer below) provided that the following conditions are met:
 
@@ -10,12 +10,14 @@ Redistribution and use in source and binary forms, with or without modification,
     Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
     This notice may not be removed or altered from any source distribution.
 
-NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                                                               #
 """
 
 from marshmallow import fields, Schema, pre_dump
 from .validations import *
 from flask_babel import _
+
+from datetime import datetime
 
 
 class CaseDetailsSchema(Schema):
@@ -27,24 +29,29 @@ class UserSchema(Schema):
     """User schema."""
     user_id = fields.Str(required=True)
     username = fields.Str(required=True, validate=validate_username)
+    role = fields.Str(required=True)
     case_comment = fields.Str(required=True, validate=validate_comment)
     case_status = fields.Int(required=True, validate=lambda p: p == 1 or p == 2 or p == 3)
+    imeis = fields.List(fields.Str(required=True, validate=validate_imei), required=True)
+    msisdns = fields.List(fields.Str(required=True, validate=validate_msisdn), required=True)
+    incident_nature = fields.Int(required=True, validate=lambda p: p == 1 or p == 2)
 
 
 class PersonalDetailsSchema(Schema):
     """Personal details schema."""
-    full_name = fields.Str(required=True, validate=validate_fullname)
-    gin = fields.Str(validate=validate_gin)
+    full_name = fields.Str(required=True, validate=lambda p: validate_fullname(val=p, name="Fullname"))
+    gin = fields.Str(required=True, validate=validate_gin)
     address = fields.Str(validate=validate_address)
     email = fields.Str(validate=validate_email)
-    dob = fields.Str(validate=validate_date)
-    number = fields.Str(validate=validate_number)
+    # dob = fields.Str(validate=validate_date)
+    number = fields.Str(required=True, validate=validate_number)
 
 
 class IncidentDetailsSchema(Schema):
     """Incident details schema."""
     incident_date = fields.Str(required=True, validate=validate_date)
     incident_nature = fields.Int(required=True, validate=lambda p: p == 1 or p == 2)
+    region = fields.Str(required=True)
 
 
 class DeviceDetailsSchema(Schema):
@@ -59,7 +66,7 @@ class DeviceDetailsSchema(Schema):
 class CaseInsertSchema(Schema):
     """Case Insertion schema."""
     case_details = fields.Nested(CaseDetailsSchema)
-    loggedin_user = fields.Nested(UserSchema, only=['username', 'user_id'])
+    loggedin_user = fields.Nested(UserSchema, only=['username', 'user_id', 'role'])
     incident_details = fields.Nested(IncidentDetailsSchema)
     personal_details = fields.Nested(PersonalDetailsSchema)
     device_details = fields.Nested(DeviceDetailsSchema)
@@ -72,7 +79,7 @@ class CaseInsertSchema(Schema):
 
 class CaseUpdateSchema(Schema):
     """Update case schema."""
-    status_args = fields.Nested(UserSchema, only=['username', 'user_id', 'case_comment'], required=True)
+    status_args = fields.Nested(UserSchema, only=['username', 'user_id', 'case_comment', 'role'], required=True)
     personal_details = fields.Nested(PersonalDetailsSchema)
     case_details = fields.Nested(CaseDetailsSchema)
 
@@ -84,7 +91,7 @@ class CaseUpdateSchema(Schema):
 
 class CaseGetBlockedSchema(Schema):
     """Update case schema."""
-    status_args = fields.Nested(UserSchema, only=['username', 'user_id', 'case_comment'], required=True)
+    status_args = fields.Nested(UserSchema, only=['username', 'user_id', 'case_comment', 'role'], required=True)
     case_details = fields.Nested(CaseDetailsSchema)
 
     @property
@@ -119,10 +126,10 @@ class SearchArgsSchema(Schema):
     """Search arguments schema."""
     tracking_id = fields.Str()
     status = fields.Str()
+    source = fields.Str()
     updated_at = fields.Str()
     imeis = fields.List(fields.Str())
     msisdns = fields.List(fields.Str())
-    dob = fields.Str()
     email = fields.Str()
     alternate_number = fields.Str()
     full_name = fields.Str()
@@ -147,6 +154,26 @@ class SearchSchema(Schema):
         return self._declared_fields
 
 
+class SearchResponseSchemaES(Schema):
+    """Search response schema."""
+    tracking_id = fields.Str(attribute='tracking_id')
+    status = fields.Str(attribute='status')
+    updated_at = fields.Str(attribute='updated_at')
+    get_blocked = fields.Boolean(attribute='get_blocked')
+    incident_details = fields.Dict(attribute='incident_details')
+    personal_details = fields.Dict(attribute='personal_details')
+    creator = fields.Dict(attribute='creator')
+    device_details = fields.Dict(attribute='device_details')
+    comments = fields.List(fields.Dict(), attribute='comments')
+    source = fields.Str(attribute='source')
+
+    @pre_dump
+    def serialize_data(self, data, **kwargs):
+        data = data['_source']
+        data['status'] = _(data.get('status'))
+        return data
+
+
 class SearchResponseSchema(Schema):
     """Search response schema."""
     tracking_id = fields.Str(attribute='tracking_id')
@@ -157,18 +184,16 @@ class SearchResponseSchema(Schema):
     personal_details = fields.Dict(attribute='personal_details')
     creator = fields.Dict(attribute='creator')
     device_details = fields.Dict(attribute='device_details')
+    comments = fields.List(fields.Dict(), attribute='comments')
 
     @pre_dump
     def serialize_data(self, data):
-        data['status'] = _(data.get('status'))
-        data['updated_at'] = data['updated_at'].strftime("%Y-%m-%d %H:%M:%S")
         data['incident_details'] = {
             "incident_date": data.get('date_of_incident'),
             "incident_nature": _(data.get('incident'))
         }
         data['personal_details'] = {
             "full_name": data.get('full_name'),
-            "dob": data.get('dob'),
             "address": data.get('address'),
             "gin": data.get('gin'),
             "number": data.get('alternate_number'),
@@ -186,3 +211,14 @@ class SearchResponseSchema(Schema):
             "username": data.get('username')
         }
         return data
+
+
+class BulkInsertSchema(Schema):
+    """Case Insertion schema."""
+    action = fields.Str(required=True, validate=lambda p: p == "block" or p == "unblock")
+    file = fields.Str(description="Submit tsv/txt file path containing bulk IMEIs")
+
+    @property
+    def fields_dict(self):
+        """Convert declared fields to dictionary."""
+        return self._declared_fields

@@ -1,5 +1,5 @@
 """
-Copyright (c) 2018-2019 Qualcomm Technologies, Inc.
+Copyright (c) 2018-2020 Qualcomm Technologies, Inc.
 All rights reserved.
 Redistribution and use in source and binary forms, with or without modification, are permitted (subject to the limitations in the disclaimer below) provided that the following conditions are met:
 
@@ -10,15 +10,16 @@ Redistribution and use in source and binary forms, with or without modification,
     Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
     This notice may not be removed or altered from any source distribution.
 
-NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                                                               #
 """
 
 from flask_restful import Api
 from .resources.common import BaseRoutes
 from .resources.admin import FetchImei, FetchMsisdn
 from .resources.system import IncidentNature, CaseStatus
-from .resources.case import CaseRoutes, CaseList, InsertCase, UpdateCase
-from .resources.search import Search
+from .resources.case import CaseRoutes, CaseList, InsertCase, UpdateCase, CheckStatus
+from .resources.search import ES_Search
+from .resources.bulk import BlockCases, DownloadFile
 
 # noinspection PyUnresolvedReferences
 from .assets.error_handlers import *
@@ -47,15 +48,20 @@ api.add_resource(UpdateCase, '/update_case/<tracking_id>')
 # noinspection PyTypeChecker
 api.add_resource(CaseList, '/cases')
 # noinspection PyTypeChecker
-api.add_resource(Search, '/search')
-
+api.add_resource(ES_Search, '/search')
+# noinspection PyTypeChecker
+api.add_resource(CheckStatus, '/status/<task_id>')
+# noinspection PyTypeChecker
+api.add_resource(BlockCases, '/bulk')
+# noinspection PyTypeChecker
+api.add_resource(DownloadFile, '/download/<filename>')
 docs = apidoc.init_doc()
 
 
 def register():
     """Method to register routes for docs."""
-    for route in [BaseRoutes, FetchImei, FetchMsisdn, IncidentNature, CaseStatus, CaseList, Search,
-                  CaseRoutes, InsertCase, UpdateCase]:
+    for route in [BaseRoutes, CaseList, CaseRoutes, InsertCase, UpdateCase, CheckStatus, CaseList, CaseStatus,
+                  BlockCases, FetchImei, FetchMsisdn, IncidentNature, ES_Search, DownloadFile]:
         docs.register(route)
 
 

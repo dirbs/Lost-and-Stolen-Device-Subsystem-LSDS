@@ -113,3 +113,4 @@ migrations/
 
 # configurations
 config.ini
+etc/config.yml

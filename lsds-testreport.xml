@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?><testsuite errors="3" failures="0" name="pytest" skipped="0" tests="3" time="12.972"><testcase classname="" file="tests/confest.py" name="tests.confest" time="0.000"><error message="collection failure">../../../.local/lib/python3.6/site-packages/_pytest/config/__init__.py:565: in import_plugin
+    __import__(importspec)
+../../../.local/lib/python3.6/site-packages/_pytest/assertion/rewrite.py:304: in load_module
+    exec(co, mod.__dict__)
+tests/fixtures.py:54: in &lt;module&gt;
+    from manage import *
+../../../.local/lib/python3.6/site-packages/_pytest/assertion/rewrite.py:304: in load_module
+    exec(co, mod.__dict__)
+manage.py:57: in &lt;module&gt;
+    from scripts.stolen_list import GenList
+../../../.local/lib/python3.6/site-packages/_pytest/assertion/rewrite.py:304: in load_module
+    exec(co, mod.__dict__)
+scripts/stolen_list.py:50: in &lt;module&gt;
+    import pandas as pd
+../../../.local/lib/python3.6/site-packages/pandas/__init__.py:42: in &lt;module&gt;
+    from pandas.core.api import *
+../../../.local/lib/python3.6/site-packages/_pytest/assertion/rewrite.py:304: in load_module
+    exec(co, mod.__dict__)
+../../../.local/lib/python3.6/site-packages/pandas/core/api.py:26: in &lt;module&gt;
+    from pandas.core.groupby import Grouper
+../../../.local/lib/python3.6/site-packages/pandas/core/groupby/__init__.py:1: in &lt;module&gt;
+    from pandas.core.groupby.groupby import GroupBy  # noqa: F401
+../../../.local/lib/python3.6/site-packages/_pytest/assertion/rewrite.py:304: in load_module
+    exec(co, mod.__dict__)
+../../../.local/lib/python3.6/site-packages/pandas/core/groupby/groupby.py:37: in &lt;module&gt;
+    from pandas.core.frame import DataFrame
+../../../.local/lib/python3.6/site-packages/_pytest/assertion/rewrite.py:304: in load_module
+    exec(co, mod.__dict__)
+../../../.local/lib/python3.6/site-packages/pandas/core/frame.py:87: in &lt;module&gt;
+    from pandas.core.generic import NDFrame, _shared_docs
+../../../.local/lib/python3.6/site-packages/_pytest/assertion/rewrite.py:304: in load_module
+    exec(co, mod.__dict__)
+../../../.local/lib/python3.6/site-packages/pandas/core/generic.py:46: in &lt;module&gt;
+    from pandas.core.internals import BlockManager
+../../../.local/lib/python3.6/site-packages/_pytest/assertion/rewrite.py:304: in load_module
+    exec(co, mod.__dict__)
+../../../.local/lib/python3.6/site-packages/pandas/core/internals.py:22: in &lt;module&gt;
+    from pandas.core.dtypes.common import (
+E   ImportError: cannot import name &apos;_ensure_int64&apos;
+
+During handling of the above exception, another exception occurred:
+../../../.local/lib/python3.6/site-packages/six.py:692: in reraise
+    raise value.with_traceback(tb)
+../../../.local/lib/python3.6/site-packages/_pytest/config/__init__.py:565: in import_plugin
+    __import__(importspec)
+../../../.local/lib/python3.6/site-packages/_pytest/assertion/rewrite.py:304: in load_module
+    exec(co, mod.__dict__)
+tests/fixtures.py:54: in &lt;module&gt;
+    from manage import *
+../../../.local/lib/python3.6/site-packages/_pytest/assertion/rewrite.py:304: in load_module
+    exec(co, mod.__dict__)
+manage.py:57: in &lt;module&gt;
+    from scripts.stolen_list import GenList
+../../../.local/lib/python3.6/site-packages/_pytest/assertion/rewrite.py:304: in load_module
+    exec(co, mod.__dict__)
+scripts/stolen_list.py:50: in &lt;module&gt;
+    import pandas as pd
+../../../.local/lib/python3.6/site-packages/pandas/__init__.py:42: in &lt;module&gt;
+    from pandas.core.api import *
+../../../.local/lib/python3.6/site-packages/_pytest/assertion/rewrite.py:304: in load_module
+    exec(co, mod.__dict__)
+../../../.local/lib/python3.6/site-packages/pandas/core/api.py:26: in &lt;module&gt;
+    from pandas.core.groupby import Grouper
+../../../.local/lib/python3.6/site-packages/pandas/core/groupby/__init__.py:1: in &lt;module&gt;
+    from pandas.core.groupby.groupby import GroupBy  # noqa: F401
+../../../.local/lib/python3.6/site-packages/_pytest/assertion/rewrite.py:304: in load_module
+    exec(co, mod.__dict__)
+../../../.local/lib/python3.6/site-packages/pandas/core/groupby/groupby.py:37: in &lt;module&gt;
+    from pandas.core.frame import DataFrame
+../../../.local/lib/python3.6/site-packages/_pytest/assertion/rewrite.py:304: in load_module
+    exec(co, mod.__dict__)
+../../../.local/lib/python3.6/site-packages/pandas/core/frame.py:87: in &lt;module&gt;
+    from pandas.core.generic import NDFrame, _shared_docs
+../../../.local/lib/python3.6/site-packages/_pytest/assertion/rewrite.py:304: in load_module
+    exec(co, mod.__dict__)
+../../../.local/lib/python3.6/site-packages/pandas/core/generic.py:46: in &lt;module&gt;
+    from pandas.core.internals import BlockManager
+../../../.local/lib/python3.6/site-packages/_pytest/assertion/rewrite.py:304: in load_module
+    exec(co, mod.__dict__)
+../../../.local/lib/python3.6/site-packages/pandas/core/internals.py:22: in &lt;module&gt;
+    from pandas.core.dtypes.common import (
+E   ImportError: Error importing plugin &quot;tests/fixtures&quot;: cannot import name &apos;_ensure_int64&apos;</error></testcase><testcase classname="" file="tests/fixtures.py" name="tests.fixtures" time="0.000"><error message="collection failure">tests/fixtures.py:54: in &lt;module&gt;
+    from manage import *
+&lt;frozen importlib._bootstrap&gt;:971: in _find_and_load
+    ???
+&lt;frozen importlib._bootstrap&gt;:955: in _find_and_load_unlocked
+    ???
+&lt;frozen importlib._bootstrap&gt;:656: in _load_unlocked
+    ???
+&lt;frozen importlib._bootstrap&gt;:626: in _load_backward_compatible
+    ???
+../../../.local/lib/python3.6/site-packages/_pytest/assertion/rewrite.py:304: in load_module
+    exec(co, mod.__dict__)
+manage.py:57: in &lt;module&gt;
+    from scripts.stolen_list import GenList
+&lt;frozen importlib._bootstrap&gt;:971: in _find_and_load
+    ???
+&lt;frozen importlib._bootstrap&gt;:955: in _find_and_load_unlocked
+    ???
+&lt;frozen importlib._bootstrap&gt;:656: in _load_unlocked
+    ???
+&lt;frozen importlib._bootstrap&gt;:626: in _load_backward_compatible
+    ???
+../../../.local/lib/python3.6/site-packages/_pytest/assertion/rewrite.py:304: in load_module
+    exec(co, mod.__dict__)
+scripts/stolen_list.py:50: in &lt;module&gt;
+    import pandas as pd
+../../../.local/lib/python3.6/site-packages/pandas/__init__.py:42: in &lt;module&gt;
+    from pandas.core.api import *
+&lt;frozen importlib._bootstrap&gt;:971: in _find_and_load
+    ???
+&lt;frozen importlib._bootstrap&gt;:955: in _find_and_load_unlocked
+    ???
+&lt;frozen importlib._bootstrap&gt;:656: in _load_unlocked
+    ???
+&lt;frozen importlib._bootstrap&gt;:626: in _load_backward_compatible
+    ???
+../../../.local/lib/python3.6/site-packages/_pytest/assertion/rewrite.py:304: in load_module
+    exec(co, mod.__dict__)
+../../../.local/lib/python3.6/site-packages/pandas/core/api.py:26: in &lt;module&gt;
+    from pandas.core.groupby import Grouper
+../../../.local/lib/python3.6/site-packages/pandas/core/groupby/__init__.py:1: in &lt;module&gt;
+    from pandas.core.groupby.groupby import GroupBy  # noqa: F401
+&lt;frozen importlib._bootstrap&gt;:971: in _find_and_load
+    ???
+&lt;frozen importlib._bootstrap&gt;:955: in _find_and_load_unlocked
+    ???
+&lt;frozen importlib._bootstrap&gt;:656: in _load_unlocked
+    ???
+&lt;frozen importlib._bootstrap&gt;:626: in _load_backward_compatible
+    ???
+../../../.local/lib/python3.6/site-packages/_pytest/assertion/rewrite.py:304: in load_module
+    exec(co, mod.__dict__)
+../../../.local/lib/python3.6/site-packages/pandas/core/groupby/groupby.py:20: in &lt;module&gt;
+    import pandas.compat as compat
+E   AttributeError: module &apos;pandas&apos; has no attribute &apos;compat&apos;</error></testcase><testcase classname="" file="tests/scripttests/test_delta_list_gen.py" name="tests.scripttests.test_delta_list_gen" time="0.000"><error message="collection failure">tests/scripttests/test_delta_list_gen.py:48: in &lt;module&gt;
+    import pandas as pd
+../../../.local/lib/python3.6/site-packages/pandas/__init__.py:42: in &lt;module&gt;
+    from pandas.core.api import *
+&lt;frozen importlib._bootstrap&gt;:971: in _find_and_load
+    ???
+&lt;frozen importlib._bootstrap&gt;:955: in _find_and_load_unlocked
+    ???
+&lt;frozen importlib._bootstrap&gt;:656: in _load_unlocked
+    ???
+&lt;frozen importlib._bootstrap&gt;:626: in _load_backward_compatible
+    ???
+../../../.local/lib/python3.6/site-packages/_pytest/assertion/rewrite.py:304: in load_module
+    exec(co, mod.__dict__)
+../../../.local/lib/python3.6/site-packages/pandas/core/api.py:26: in &lt;module&gt;
+    from pandas.core.groupby import Grouper
+../../../.local/lib/python3.6/site-packages/pandas/core/groupby/__init__.py:1: in &lt;module&gt;
+    from pandas.core.groupby.groupby import GroupBy  # noqa: F401
+&lt;frozen importlib._bootstrap&gt;:971: in _find_and_load
+    ???
+&lt;frozen importlib._bootstrap&gt;:955: in _find_and_load_unlocked
+    ???
+&lt;frozen importlib._bootstrap&gt;:656: in _load_unlocked
+    ???
+&lt;frozen importlib._bootstrap&gt;:626: in _load_backward_compatible
+    ???
+../../../.local/lib/python3.6/site-packages/_pytest/assertion/rewrite.py:304: in load_module
+    exec(co, mod.__dict__)
+../../../.local/lib/python3.6/site-packages/pandas/core/groupby/groupby.py:20: in &lt;module&gt;
+    import pandas.compat as compat
+E   AttributeError: module &apos;pandas&apos; has no attribute &apos;compat&apos;</error></testcase></testsuite>

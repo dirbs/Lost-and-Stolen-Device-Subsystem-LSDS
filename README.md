@@ -7,9 +7,10 @@
 ## License
 Copyright (c) 2018-2021 Qualcomm Technologies, Inc.
 
-All rights reserved.
 
+All rights reserved.
 Redistribution and use in source and binary forms, with or without modification, are permitted (subject to the limitations in the disclaimer below) provided that the following conditions are met:
+
 
 * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
 * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
@@ -18,18 +19,22 @@ Redistribution and use in source and binary forms, with or without modification,
 * Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
 * This notice may not be removed or altered from any source distribution.
 
+
 NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+### Lost & Stolen Device Subsystem (LSDS)
+Lost & Stolen Device Subsystem (LSDS) that is part of the Device Identification,
+Registration and Blocking (DIRBS) system.It is used to report lost & stolen devices.
 
-## Documentation
+### Documentation
 [LSDS-API-Installation-Guide-1.0.0](https://github.com/dirbs/Documentation/blob/master/Lost-and-Stolen-Device-Subsystem/LSDS-API-Installation-Guide-1.0.0.pdf)<br />
 [LSDS-SPA-Installation-Guide-1.0.0.pdf](https://github.com/dirbs/Documentation/blob/master/Lost-and-Stolen-Device-Subsystem/LSDS-SPA-Installation-Guide-1.0.0.pdf) <br />
 [LSDS-User-Guide-1.0.0.pdf](https://github.com/dirbs/Documentation/blob/master/Lost-and-Stolen-Device-Subsystem/LSDS-User-Guide-1.0.0.pdf)<br />
 
-## Frontend Application Repo
+### Frontend Application Repo
 https://github.com/dirbs/Lost-and-Stolen-Device-Subsystem-Frontend
 
-## Directory structure
+### Directory structure
 
 This repository contains code for **LSDS** part of the **DIRBS**. It contains
 
@@ -48,13 +53,14 @@ all commands mentioned in this guide are run from root directory of the project 
 
 On Windows, we assume that a Bash like shell is available (i.e Bash under Cygwin), with GNU make installed.
 
-### Starting a dev environment
+#### Starting a dev environment
 The easiest and quickest way to get started is to use local-only environment (i.e everything runs locally, including
 Postgresql Server). To setup the local environment, follow the section below:
 
-### Setting up local dev environment
+#### Setting up local dev environment
 For setting up a local dev environment we assume that the ```prerequisites``` are met already. To setup a local 
 environment:
+* Install elastic search in the system
 * Create database using Postgresql (Name and credentials should be same as in [config](tests/testdata/config_test.ini))
 * Create virtual environment using **virtualenv** and activate it:
 ```bash
@@ -66,7 +72,15 @@ Make sure the virtual environment is made using python3
 
 * Create /lists folder in / directory
 
+* Create /UPLOADS folder in / directory
+
 * Replace sample configuration in config.ini to similar configurations in (tests/testdata/config_test.ini)
+
+* Install requirements
+
+```bash
+pip3 install -r requirements.txt
+```
 
 * Run Database migrations using:
 
@@ -81,6 +95,12 @@ This will automatically create and migrate database schemas and requirements.
 pybabel compile -d app/translations
 ```
 
+* Start celery using:
+
+```bash
+make start-celery
+```
+
 * Start LSDS development server using:
 
 ```bash
@@ -89,7 +109,7 @@ make start-dev
 
 This will start a flask development environment for LSDS.
 
-* To run tests create another user other than root user.
+**Note:** Make sure the system is deployed using above mentioned steps before running unit tests. Moreover, you'd require another user other than root user to run unit tests.
 * To run unit tests, run:
 
 ```bash
@@ -102,7 +122,7 @@ make test
 make lint
 ```
 
-### Other useful commands
+###Other useful commands
 
 * To install a fresh database:
 
@@ -138,4 +158,23 @@ make test
 
 ```bash
 make lint
+```
+###Elastic Search Commands
+
+* Create elastic search index
+
+```bash
+make create-index
+```
+
+* Bulk export postgresql data to elastic search
+
+```bash
+make migrate-data-bulk
+```
+
+* Export postgresql data to elastic search
+
+```bash
+make migrate-data
 ```
